@@ -1,6 +1,5 @@
-MakerBased AR Sample
+MarkerBased AR Sample
 ====================
-https://www.assetstore.unity3d.com/#!/content/29678
 
 Please read the [manual](ReadMe.pdf).
 
