@@ -1,5 +1,6 @@
 MarkerBased AR Sample
 ====================
+http://u3d.as/content/enox-software/marker-based-ar-sample
 
 Please read the [manual](ReadMe.pdf).
 
