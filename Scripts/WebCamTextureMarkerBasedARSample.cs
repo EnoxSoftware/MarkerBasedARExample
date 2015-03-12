@@ -138,7 +138,7 @@ namespace MarkerBasedARSample
 				{
 						while (true) {
 								//If you want to use webcamTexture.width and webcamTexture.height on iOS, you have to wait until webcamTexture.didUpdateThisFrame == 1, otherwise these two values will be equal to 16. (http://forum.unity3d.com/threads/webcamtexture-and-error-0x0502.123922/)
-								if (webCamTexture.didUpdateThisFrame) {
+								if (webCamTexture.width > 16 && webCamTexture.height > 16) {
 										Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
 					
 					
@@ -160,20 +160,8 @@ namespace MarkerBasedARSample
 					
 					
 										bool _videoVerticallyMirrored = webCamTexture.videoVerticallyMirrored;
-					
-					
 										float scaleX = 1;
 										float scaleY = _videoVerticallyMirrored ? -1.0f : 1.0f;
-					
-										//								//Mirror
-										//								if (isFront) {
-										//										if (webCamTexture.videoRotationAngle == 0 || webCamTexture.videoRotationAngle == 180) {
-										//												scaleX *= -1; 
-										//										} else {
-										//												scaleY *= -1; 
-										//										}
-										//                
-										//								}
 					
 										gameObject.transform.localScale = new Vector3 (scaleX * gameObject.transform.localScale.x, scaleY * gameObject.transform.localScale.y, 1);
 
@@ -229,6 +217,8 @@ namespace MarkerBasedARSample
 										//Adjust Unity Camera FOV
 										for (int i = 0; i < ARCamera.Length; i++) {
 												ARCamera [i].fieldOfView = (float)fovy [0];
+												if (_videoVerticallyMirrored)
+														ARCamera [i].projectionMatrix = ARCamera [i].projectionMatrix * Matrix4x4.Scale (new Vector3 (1, -1, 1));
 										}
 										
 
@@ -243,7 +233,7 @@ namespace MarkerBasedARSample
 
 										//OpenGL to Unity Coordinate System Convert Matrix
 										//http://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html that camera space matches OpenGL convention: camera's forward is the negative Z axis. This is different from Unity's convention, where forward is the positive Z axis.
-										invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
+										invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, scaleY * 1, -1));
 										Debug.Log ("invertZM " + invertZM.ToString ());
 
 
@@ -262,11 +252,11 @@ namespace MarkerBasedARSample
 				{
 						if (!initDone)
 								return;
-			
-						if (webCamTexture.didUpdateThisFrame) {
+
+						if (webCamTexture.width > 16 && webCamTexture.height > 16) {
 								
 				
-								Utils.WebCamTextureToMat (webCamTexture, rgbaMat, colors);
+								Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
 
 								markerDetector.processFrame (rgbaMat, 1);
 

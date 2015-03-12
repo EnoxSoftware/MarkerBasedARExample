@@ -75,6 +75,9 @@ namespace MarkerBasedARSample
 						//Adjust Unity Camera FOV
 						ARCamera.fieldOfView = (float)fovy [0];
 
+//			ARCamera.projectionMatrix = ARCamera.projectionMatrix * Matrix4x4.Scale(new Vector3(-1, -1, 1));
+//			gameObject.transform.localScale = new Vector3 (-1 * gameObject.transform.localScale.x, -1 * gameObject.transform.localScale.y, 1);
+
 
 		 
 						MarkerDetector markerDetector = new MarkerDetector (camMatrix, distCoeffs);
