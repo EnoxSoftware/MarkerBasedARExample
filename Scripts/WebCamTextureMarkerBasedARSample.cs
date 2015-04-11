@@ -21,12 +21,12 @@ namespace MarkerBasedARSample
 				/// </summary>
 				Color32[] colors;
 
-		#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
-		/// <summary>
-		/// The is front.
-		/// </summary>
-		bool isFront = false;
-		#endif
+
+				/// <summary>
+				/// The is front.
+				/// </summary>
+				public bool isFrontFacing = false;
+
 
 				/// <summary>
 				/// The width.
@@ -98,31 +98,7 @@ namespace MarkerBasedARSample
 				// Use this for initialization
 				void Start ()
 				{
-						// Checks how many and which cameras are available on the device
-						for (int cameraIndex = 0; cameraIndex < WebCamTexture.devices.Length; cameraIndex++) {
-				
-								#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
-				                if (WebCamTexture.devices [cameraIndex].isFrontFacing == isFront) {
-								#endif
-					
-								Debug.Log (cameraIndex + " name " + WebCamTexture.devices [cameraIndex].name + " isFrontFacing " + WebCamTexture.devices [cameraIndex].isFrontFacing);
-					
-								//Set the appropriate fps
-								webCamTexture = new WebCamTexture (WebCamTexture.devices [cameraIndex].name, width, height, 30);
-					
-								#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
-					                break;
-				                }
-								#endif
-				
-						}
-			
-						Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
-			
-			
-			
-						// Starts the camera
-						webCamTexture.Play ();
+						
 			
 			
 						StartCoroutine (init ());
@@ -136,34 +112,68 @@ namespace MarkerBasedARSample
 				/// </summary>
 				private IEnumerator init ()
 				{
+						if (webCamTexture != null) {
+								webCamTexture.Stop ();
+								initDone = false;
+				
+								rgbaMat.Dispose ();
+						}
+
+						// Checks how many and which cameras are available on the device
+						for (int cameraIndex = 0; cameraIndex < WebCamTexture.devices.Length; cameraIndex++) {
+				
+				
+								if (WebCamTexture.devices [cameraIndex].isFrontFacing == isFrontFacing) {
+					
+					
+										Debug.Log (cameraIndex + " name " + WebCamTexture.devices [cameraIndex].name + " isFrontFacing " + WebCamTexture.devices [cameraIndex].isFrontFacing);
+					
+										
+										webCamTexture = new WebCamTexture (WebCamTexture.devices [cameraIndex].name, width, height);
+					
+					
+										break;
+								}
+				
+				
+						}
+
+						if (webCamTexture == null) {
+								webCamTexture = new WebCamTexture (width, height);
+						}
+			
+						Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
+			
+			
+			
+						// Starts the camera
+						webCamTexture.Play ();
+
 						while (true) {
 								//If you want to use webcamTexture.width and webcamTexture.height on iOS, you have to wait until webcamTexture.didUpdateThisFrame == 1, otherwise these two values will be equal to 16. (http://forum.unity3d.com/threads/webcamtexture-and-error-0x0502.123922/)
 								if (webCamTexture.width > 16 && webCamTexture.height > 16) {
 										Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
-					
+										Debug.Log ("videoRotationAngle " + webCamTexture.videoRotationAngle + " videoVerticallyMirrored " + webCamTexture.videoVerticallyMirrored);
+
 					
 										colors = new Color32[webCamTexture.width * webCamTexture.height];
 					
 										rgbaMat = new Mat (webCamTexture.height, webCamTexture.width, CvType.CV_8UC4);
 					
 										texture = new Texture2D (webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
+					
 
-
-										//gameObject.transform.eulerAngles = new Vector3 (0, 0, -90);
-										gameObject.transform.localScale = new Vector3 (webCamTexture.width, webCamTexture.height, 1);
-					
-					
-					
 					
 										gameObject.transform.localEulerAngles = new Vector3 (0, 0, 0);
-										gameObject.transform.rotation = gameObject.transform.rotation * Quaternion.AngleAxis (webCamTexture.videoRotationAngle, Vector3.back);
+//										gameObject.transform.rotation = gameObject.transform.rotation * Quaternion.AngleAxis (webCamTexture.videoRotationAngle, Vector3.back);
 					
-					
-										bool _videoVerticallyMirrored = webCamTexture.videoVerticallyMirrored;
-										float scaleX = 1;
-										float scaleY = _videoVerticallyMirrored ? -1.0f : 1.0f;
-					
-										gameObject.transform.localScale = new Vector3 (scaleX * gameObject.transform.localScale.x, scaleY * gameObject.transform.localScale.y, 1);
+
+										gameObject.transform.localScale = new Vector3 (webCamTexture.width, webCamTexture.height, 1);
+
+//										bool videoVerticallyMirrored = webCamTexture.videoVerticallyMirrored;
+//										float scaleX = 1;
+//										float scaleY = videoVerticallyMirrored ? -1.0f : 1.0f;
+//										gameObject.transform.localScale = new Vector3 (scaleX * gameObject.transform.localScale.x, scaleY * gameObject.transform.localScale.y, 1);
 
 					
 										gameObject.GetComponent<Renderer> ().material.mainTexture = texture;
@@ -217,8 +227,6 @@ namespace MarkerBasedARSample
 										//Adjust Unity Camera FOV
 										for (int i = 0; i < ARCamera.Length; i++) {
 												ARCamera [i].fieldOfView = (float)fovy [0];
-												if (_videoVerticallyMirrored)
-														ARCamera [i].projectionMatrix = ARCamera [i].projectionMatrix * Matrix4x4.Scale (new Vector3 (1, -1, 1));
 										}
 										
 
@@ -233,7 +241,7 @@ namespace MarkerBasedARSample
 
 										//OpenGL to Unity Coordinate System Convert Matrix
 										//http://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html that camera space matches OpenGL convention: camera's forward is the negative Z axis. This is different from Unity's convention, where forward is the positive Z axis.
-										invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, scaleY * 1, -1));
+										invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
 										Debug.Log ("invertZM " + invertZM.ToString ());
 
 
@@ -258,6 +266,15 @@ namespace MarkerBasedARSample
 				
 								Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
 
+								//flip to correct direction.
+								if (webCamTexture.videoRotationAngle == 180 && webCamTexture.videoVerticallyMirrored) {
+										Core.flip (rgbaMat, rgbaMat, 1);
+								} else if (webCamTexture.videoRotationAngle == 180) {
+										Core.flip (rgbaMat, rgbaMat, -1);
+								} else if (webCamTexture.videoVerticallyMirrored) {
+										Core.flip (rgbaMat, rgbaMat, 0);
+								}
+				
 								markerDetector.processFrame (rgbaMat, 1);
 
 								//Debug.Log ("markerDetector.getTransformations ().Count " + markerDetector.getTransformations ().Count);
@@ -333,6 +350,10 @@ namespace MarkerBasedARSample
 			
 						if (GUILayout.Button ("back")) {
 								Application.LoadLevel ("MarkerBasedARSample");
+						}
+						if (GUILayout.Button ("change camera")) {
+								isFrontFacing = !isFrontFacing;
+								StartCoroutine (init ());
 						}
 			
 						GUILayout.EndVertical ();
