@@ -56,10 +56,23 @@ public class Marker
 		{
 				int[][] ids = new int[][]
 		{
+//			(1)
 			new int[]{1,0,0,0,0},
 			new int[]{1,0,1,1,1},
-			new int[]{0,1,0,0,1},
+			new int[]{0,1,0,0,1}, //dummy data
 			new int[]{0,1,1,1,0}
+
+//			(2)
+//			new int[]{0,0,1,0,0},
+//			new int[]{1,1,1,1,1},
+//			new int[]{1,0,1,0,1},
+//			new int[]{1,1,0,1,1}
+
+//			(3)
+//			new int[]{1,1,1,1,1},
+//			new int[]{1,0,0,0,1},
+//			new int[]{1,1,1,1,0},
+//			new int[]{0,1,1,1,1}
 		};
 		
 				int dist = 0;

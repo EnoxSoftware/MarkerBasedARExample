@@ -11,6 +11,10 @@ namespace MarkerBasedARSample
 /// </summary>
 		public class Texture2DMarkerBasedARSample : MonoBehaviour
 		{
+		        /// <summary>
+		        /// The image texture.
+		        /// </summary>
+				public Texture2D imgTexture;
 
 				/// <summary>
 				/// The AR camera.
@@ -21,8 +25,6 @@ namespace MarkerBasedARSample
 				// Use this for initialization
 				void Start ()
 				{
-						Texture2D imgTexture = Resources.Load ("MarkerTest") as Texture2D;
-
 
 						gameObject.transform.localScale = new Vector3 (imgTexture.width, imgTexture.height, 1);
 						Camera.main.orthographicSize = imgTexture.height / 2;

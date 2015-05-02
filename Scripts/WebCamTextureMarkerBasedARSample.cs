@@ -17,6 +17,11 @@ namespace MarkerBasedARSample
 				WebCamTexture webCamTexture;
 
 				/// <summary>
+				/// The web cam device.
+				/// </summary>
+				WebCamDevice webCamDevice;
+
+				/// <summary>
 				/// The colors.
 				/// </summary>
 				Color32[] colors;
@@ -98,13 +103,9 @@ namespace MarkerBasedARSample
 				// Use this for initialization
 				void Start ()
 				{
-						
-			
 			
 						StartCoroutine (init ());
-			
-			
-			
+
 				}
 
 				/// <summary>
@@ -127,9 +128,10 @@ namespace MarkerBasedARSample
 					
 					
 										Debug.Log (cameraIndex + " name " + WebCamTexture.devices [cameraIndex].name + " isFrontFacing " + WebCamTexture.devices [cameraIndex].isFrontFacing);
-					
+
+										webCamDevice = WebCamTexture.devices [cameraIndex];
 										
-										webCamTexture = new WebCamTexture (WebCamTexture.devices [cameraIndex].name, width, height);
+										webCamTexture = new WebCamTexture (webCamDevice.name, width, height);
 					
 					
 										break;
@@ -139,7 +141,8 @@ namespace MarkerBasedARSample
 						}
 
 						if (webCamTexture == null) {
-								webCamTexture = new WebCamTexture (width, height);
+								webCamDevice = WebCamTexture.devices [0];
+								webCamTexture = new WebCamTexture (webCamDevice.name, width, height);
 						}
 			
 						Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
@@ -151,9 +154,13 @@ namespace MarkerBasedARSample
 
 						while (true) {
 								//If you want to use webcamTexture.width and webcamTexture.height on iOS, you have to wait until webcamTexture.didUpdateThisFrame == 1, otherwise these two values will be equal to 16. (http://forum.unity3d.com/threads/webcamtexture-and-error-0x0502.123922/)
-								if (webCamTexture.width > 16 && webCamTexture.height > 16) {
+								#if UNITY_IPHONE && !UNITY_EDITOR
+				if (webCamTexture.width > 16 && webCamTexture.height > 16) {
+								#else
+								if (webCamTexture.didUpdateThisFrame) {
+										#endif
 										Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
-										Debug.Log ("videoRotationAngle " + webCamTexture.videoRotationAngle + " videoVerticallyMirrored " + webCamTexture.videoVerticallyMirrored);
+										Debug.Log ("videoRotationAngle " + webCamTexture.videoRotationAngle + " videoVerticallyMirrored " + webCamTexture.videoVerticallyMirrored + " isFrongFacing " + webCamDevice.isFrontFacing);
 
 					
 										colors = new Color32[webCamTexture.width * webCamTexture.height];
@@ -261,18 +268,44 @@ namespace MarkerBasedARSample
 						if (!initDone)
 								return;
 
-						if (webCamTexture.width > 16 && webCamTexture.height > 16) {
+						#if UNITY_IPHONE && !UNITY_EDITOR
+				if (webCamTexture.width > 16 && webCamTexture.height > 16) {
+						#else
+						if (webCamTexture.didUpdateThisFrame) {
+								#endif
 								
 				
 								Utils.webCamTextureToMat (webCamTexture, rgbaMat, colors);
 
 								//flip to correct direction.
-								if (webCamTexture.videoRotationAngle == 180 && webCamTexture.videoVerticallyMirrored) {
-										Core.flip (rgbaMat, rgbaMat, 1);
-								} else if (webCamTexture.videoRotationAngle == 180) {
-										Core.flip (rgbaMat, rgbaMat, -1);
-								} else if (webCamTexture.videoVerticallyMirrored) {
-										Core.flip (rgbaMat, rgbaMat, 0);
+								if (webCamTexture.videoVerticallyMirrored) {
+										if (webCamDevice.isFrontFacing) {
+												if (webCamTexture.videoRotationAngle == 0) {
+														Core.flip (rgbaMat, rgbaMat, -1);
+												} else if (webCamTexture.videoRotationAngle == 180) {
+									
+												}
+										} else {
+												if (webCamTexture.videoRotationAngle == 0) {
+														Core.flip (rgbaMat, rgbaMat, 0);
+												} else if (webCamTexture.videoRotationAngle == 180) {
+														Core.flip (rgbaMat, rgbaMat, 1);
+												}
+										}
+								} else {
+										if (webCamDevice.isFrontFacing) {
+												if (webCamTexture.videoRotationAngle == 0) {
+														Core.flip (rgbaMat, rgbaMat, 1);
+												} else if (webCamTexture.videoRotationAngle == 180) {
+														Core.flip (rgbaMat, rgbaMat, 0);
+												}
+										} else {
+												if (webCamTexture.videoRotationAngle == 0) {
+									
+												} else if (webCamTexture.videoRotationAngle == 180) {
+														Core.flip (rgbaMat, rgbaMat, -1);
+												}
+										}
 								}
 				
 								markerDetector.processFrame (rgbaMat, 1);
