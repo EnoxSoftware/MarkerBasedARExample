@@ -243,10 +243,17 @@ public class Marker
 
 				int thickness = 2;
 
-				Core.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [1], pointsArray [2], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [2], pointsArray [3], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [3], pointsArray [0], color, thickness, Core.LINE_AA, 0);
+#if OPENCV_3
+				Imgproc.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
+                Imgproc.line(image, pointsArray[1], pointsArray[2], color, thickness, Core.LINE_AA, 0);
+                Imgproc.line(image, pointsArray[2], pointsArray[3], color, thickness, Core.LINE_AA, 0);
+                Imgproc.line(image, pointsArray[3], pointsArray[0], color, thickness, Core.LINE_AA, 0);
+#else
+                Core.line(image, pointsArray[0], pointsArray[1], color, thickness, Core.LINE_AA, 0);
+                Core.line(image, pointsArray[1], pointsArray[2], color, thickness, Core.LINE_AA, 0);
+                Core.line(image, pointsArray[2], pointsArray[3], color, thickness, Core.LINE_AA, 0);
+                Core.line(image, pointsArray[3], pointsArray[0], color, thickness, Core.LINE_AA, 0);
+#endif
 
 		}
 
