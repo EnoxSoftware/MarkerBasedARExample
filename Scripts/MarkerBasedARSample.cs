@@ -17,30 +17,20 @@ namespace MarkerBasedARSample
 		{
 			
 		}
-		
-		void OnGUI ()
+
+		public void OnShowLicenseButton ()
 		{
-			float screenScale = Screen.height / 240.0f;
-			Matrix4x4 scaledMatrix = Matrix4x4.Scale (new Vector3 (screenScale, screenScale, screenScale));
-			GUI.matrix = scaledMatrix;
-			
-			
-			GUILayout.BeginVertical ();
-			
-			if (GUILayout.Button ("Show License")) {
-				Application.LoadLevel ("ShowLicense");
-			}
-			
-			if (GUILayout.Button ("Texture2DMarkerBasedARSample")) {
-				Application.LoadLevel ("Texture2DMarkerBasedARSample");
-			}
-			
-			if (GUILayout.Button ("WebCamTextureMarkerBasedARSample")) {
-				Application.LoadLevel ("WebCamTextureMarkerBasedARSample");
-			}
-			
-			
-			GUILayout.EndVertical ();
+			Application.LoadLevel ("ShowLicense");
+		}
+		
+		public void OnTexture2DMarkerBasedARSample ()
+		{
+			Application.LoadLevel ("Texture2DMarkerBasedARSample");
+		}
+		
+		public void OnWebCamTextureMarkerBasedARSample ()
+		{
+			Application.LoadLevel ("WebCamTextureMarkerBasedARSample");
 		}
 	}
 }

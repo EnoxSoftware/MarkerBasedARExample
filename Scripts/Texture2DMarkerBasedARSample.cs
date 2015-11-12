@@ -11,9 +11,9 @@ namespace MarkerBasedARSample
 /// </summary>
 		public class Texture2DMarkerBasedARSample : MonoBehaviour
 		{
-		        /// <summary>
-		        /// The image texture.
-		        /// </summary>
+				/// <summary>
+				/// The image texture.
+				/// </summary>
 				public Texture2D imgTexture;
 
 				/// <summary>
@@ -145,20 +145,9 @@ namespace MarkerBasedARSample
 						return result;
 				}
 
-				void OnGUI ()
+				public void OnBackButton ()
 				{
-						float screenScale = Screen.height / 240.0f;
-						Matrix4x4 scaledMatrix = Matrix4x4.Scale (new Vector3 (screenScale, screenScale, screenScale));
-						GUI.matrix = scaledMatrix;
-			
-			
-						GUILayout.BeginVertical ();
-			
-						if (GUILayout.Button ("back")) {
-								Application.LoadLevel ("MarkerBasedARSample");
-						}
-			
-						GUILayout.EndVertical ();
+						Application.LoadLevel ("MarkerBasedARSample");
 				}
 		}
 }
