@@ -21,6 +21,10 @@ namespace MarkerBasedARSample
 				/// </summary>
 				public Camera ARCamera;
 
+		        /// <summary>
+		        /// The marker design.
+		        /// </summary>
+				public MarkerDesign markerDesign;
 
 				// Use this for initialization
 				void Start ()
@@ -82,7 +86,7 @@ namespace MarkerBasedARSample
 
 
 		 
-						MarkerDetector markerDetector = new MarkerDetector (camMatrix, distCoeffs);
+						MarkerDetector markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesign);
 
 						markerDetector.processFrame (imgMat, 1);
 
@@ -92,20 +96,23 @@ namespace MarkerBasedARSample
 						Debug.Log ("lookAt " + lookAtM.ToString ());
 
 						//Marker to Camera Coordinate System Convert Matrix
-						Matrix4x4 transformationM = markerDetector.getTransformations () [0];
-						Debug.Log ("transformationM " + transformationM.ToString ());
+						if (markerDetector.getTransformations ().Count > 0) {
+								Matrix4x4 transformationM = markerDetector.getTransformations () [0];
+								Debug.Log ("transformationM " + transformationM.ToString ());
 
-						//OpenGL to Unity Coordinate System Convert Matrix
-						//http://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html that camera space matches OpenGL convention: camera's forward is the negative Z axis. This is different from Unity's convention, where forward is the positive Z axis. 
-						Matrix4x4 invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
-						Debug.Log ("invertZM " + invertZM.ToString ());
+								//OpenGL to Unity Coordinate System Convert Matrix
+								//http://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html that camera space matches OpenGL convention: camera's forward is the negative Z axis. This is different from Unity's convention, where forward is the positive Z axis. 
+								Matrix4x4 invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
+								Debug.Log ("invertZM " + invertZM.ToString ());
 
-						Matrix4x4 worldToCameraM = lookAtM * transformationM * invertZM;
-						Debug.Log ("worldToCameraM " + worldToCameraM.ToString ());
+								Matrix4x4 worldToCameraM = lookAtM * transformationM * invertZM;
+								Debug.Log ("worldToCameraM " + worldToCameraM.ToString ());
 
-						ARCamera.worldToCameraMatrix = worldToCameraM;
+								ARCamera.worldToCameraMatrix = worldToCameraM;
 		
-
+						} else {
+								Debug.LogWarning ("Marker is not detected");
+						}
 
 
 

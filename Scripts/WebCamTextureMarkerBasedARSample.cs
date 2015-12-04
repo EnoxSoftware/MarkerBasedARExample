@@ -103,7 +103,10 @@ namespace MarkerBasedARSample
 				/// </summary>
 				Matrix4x4 worldToCameraM;
 
-		
+				/// <summary>
+				/// The marker design.
+				/// </summary>
+				public MarkerDesign markerDesign;
 		
 				// Use this for initialization
 				void Start ()
@@ -169,7 +172,7 @@ namespace MarkerBasedARSample
 												yield return new WaitForEndOfFrame ();
 										} 
 										#endif
-								#endif
+										#endif
 										Debug.Log ("width " + webCamTexture.width + " height " + webCamTexture.height + " fps " + webCamTexture.requestedFPS);
 										Debug.Log ("videoRotationAngle " + webCamTexture.videoRotationAngle + " videoVerticallyMirrored " + webCamTexture.videoVerticallyMirrored + " isFrongFacing " + webCamDevice.isFrontFacing);
 
@@ -232,7 +235,7 @@ namespace MarkerBasedARSample
 
 										
 					
-										markerDetector = new MarkerDetector (camMatrix, distCoeffs);
+										markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesign);
 
 
 										//Marker Coordinate Initial Matrix
@@ -390,13 +393,13 @@ namespace MarkerBasedARSample
 
 				public void OnBackButton ()
 				{
-					Application.LoadLevel ("MarkerBasedARSample");
+						Application.LoadLevel ("MarkerBasedARSample");
 				}
 				
 				public void OnChangeCameraButton ()
 				{
-					shouldUseFrontFacing = !shouldUseFrontFacing;
-					StartCoroutine (init ());
+						shouldUseFrontFacing = !shouldUseFrontFacing;
+						StartCoroutine (init ());
 				}
 		}
 	

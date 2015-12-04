@@ -52,52 +52,27 @@ public class Marker
 		/// </summary>
 		/// <returns>The dist marker.</returns>
 		/// <param name="bits">Bits.</param>
-		public static int hammDistMarker (Mat bits)
+		public static int hammDistMarker (Mat bits, byte[,] markerDesign)
 		{
-				int[][] ids = new int[][]
-		{
-//			(1)
-			new int[]{1,0,0,0,0},
-			new int[]{1,0,1,1,1},
-			new int[]{0,1,0,0,1}, //dummy data
-			new int[]{0,1,1,1,0}
 
-//			(2)
-//			new int[]{0,0,1,0,0},
-//			new int[]{1,1,1,1,1},
-//			new int[]{1,0,1,0,1},
-//			new int[]{1,1,0,1,1}
-
-//			(3)
-//			new int[]{1,1,1,1,1},
-//			new int[]{1,0,0,0,1},
-//			new int[]{1,1,1,1,0},
-//			new int[]{0,1,1,1,1}
-		};
-		
 				int dist = 0;
 
-				byte[] b = new byte[1];
+				int size = markerDesign.GetLength(0);
+
+				byte[] b = new byte[size * size];
+
+				bits.get (0, 0, b);
 		
-				for (int y=0; y<5; y++) {
-						int minSum = 100000; //hamming distance to each possible word
-			
-						for (int p=0; p<4; p++) {
-								int sum = 0;
-								//now, count
-								for (int x=0; x<5; x++) {
-
-										bits.get (y, x, b);
-
-										sum += (b [0] == ids [p] [x]) ? 0 : 1;
-								}
-				
-								if (minSum > sum)
-										minSum = sum;
+				for (int y=0; y<size; y++) {
+						
+						int sum = 0;
+						
+						for (int x=0; x<size; x++) {
+					
+								sum += (b [y*size + x] == markerDesign [y,x]) ? 0 : 1;
 						}
-			
-						//do the and
-						dist += minSum;
+						
+						dist += sum;
 				}
 		
 				return dist;
@@ -110,13 +85,15 @@ public class Marker
 		public static int mat2id (Mat bits)
 		{
 				int val = 0;
-				for (int y=0; y<5; y++) {
+
+				int size = bits.rows ();
+				for (int y=0; y<size; y++) {
 						val <<= 1;
 						if (bits.get (y, 1) [0] == 1)
 								val |= 1;
 
 						val <<= 1;
-						if (bits.get (y, 3) [0] == 1)
+						if (bits.get (y, size - 2) [0] == 1)
 								val |= 1;
 
 				}
@@ -129,7 +106,7 @@ public class Marker
 		/// <returns>The marker identifier.</returns>
 		/// <param name="markerImage">Marker image.</param>
 		/// <param name="nRotations">N rotations.</param>
-		public static int getMarkerId (Mat markerImage, MatOfInt nRotations)
+		public static int getMarkerId (Mat markerImage, MatOfInt nRotations, byte[,] markerDesign)
 		{
 
 		
@@ -141,16 +118,18 @@ public class Marker
 		
 				//Markers  are divided in 7x7 regions, of which the inner 5x5 belongs to marker info
 				//the external border should be entirely black
+
+				int size = markerDesign.GetLength(0);
 		
-				int cellSize = markerImage.rows () / 7;
+				int cellSize = markerImage.rows () / (size + 2);
 		
-				for (int y=0; y<7; y++) {
-						int inc = 6;
+				for (int y=0; y<(size+2); y++) {
+						int inc = size + 1;
 			
-						if (y == 0 || y == 6)
+						if (y == 0 || y == (size + 1))
 								inc = 1; //for first and last row, check the whole border
 			
-						for (int x=0; x<7; x+=inc) {
+						for (int x=0; x<(size+2); x+=inc) {
 								int cellX = x * cellSize;
 								int cellY = y * cellSize;
 								Mat cell = new Mat (grey, new OpenCVForUnity.Rect (cellX, cellY, cellSize, cellSize));
@@ -166,11 +145,11 @@ public class Marker
 						}
 				}
 
-				Mat bitMatrix = Mat.zeros (5, 5, CvType.CV_8UC1);
+				Mat bitMatrix = Mat.zeros (size, size, CvType.CV_8UC1);
 		
 				//get information(for each inner square, determine if it is  black or white)  
-				for (int y=0; y<5; y++) {
-						for (int x=0; x<5; x++) {
+				for (int y=0; y<size; y++) {
+						for (int x=0; x<size; x++) {
 								int cellX = (x + 1) * cellSize;
 								int cellY = (y + 1) * cellSize;
 								Mat cell = new Mat (grey, new OpenCVForUnity.Rect (cellX, cellY, cellSize, cellSize));
@@ -196,7 +175,7 @@ public class Marker
 				
 		
 				rotations [0] = bitMatrix;  
-				distances [0] = hammDistMarker (rotations [0]);
+				distances [0] = hammDistMarker (rotations [0], markerDesign);
 
 
 
@@ -206,7 +185,7 @@ public class Marker
 				for (int i=1; i<4; i++) {
 						//get the hamming distance to the nearest possible word
 						rotations [i] = rotate (rotations [i - 1]);
-						distances [i] = hammDistMarker (rotations [i]);
+						distances [i] = hammDistMarker (rotations [i], markerDesign);
 			
 						if (distances [i] < first) {
 								first = distances [i];
@@ -249,10 +228,10 @@ public class Marker
                 Imgproc.line(image, pointsArray[2], pointsArray[3], color, thickness, Core.LINE_AA, 0);
                 Imgproc.line(image, pointsArray[3], pointsArray[0], color, thickness, Core.LINE_AA, 0);
 #else
-                Core.line(image, pointsArray[0], pointsArray[1], color, thickness, Core.LINE_AA, 0);
-                Core.line(image, pointsArray[1], pointsArray[2], color, thickness, Core.LINE_AA, 0);
-                Core.line(image, pointsArray[2], pointsArray[3], color, thickness, Core.LINE_AA, 0);
-                Core.line(image, pointsArray[3], pointsArray[0], color, thickness, Core.LINE_AA, 0);
+				Core.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
+				Core.line (image, pointsArray [1], pointsArray [2], color, thickness, Core.LINE_AA, 0);
+				Core.line (image, pointsArray [2], pointsArray [3], color, thickness, Core.LINE_AA, 0);
+				Core.line (image, pointsArray [3], pointsArray [0], color, thickness, Core.LINE_AA, 0);
 #endif
 
 		}

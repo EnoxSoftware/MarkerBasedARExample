@@ -10,6 +10,17 @@ using OpenCVForUnity;
 /// </summary>
 public class MarkerDetector
 {
+		public byte[,] m_markerDesign = 
+	{
+		{1,0,0,0,0},
+		{0,1,1,1,0},
+		{1,0,1,1,1},
+		{1,0,1,1,1},
+		{1,0,1,1,1}
+		
+	};
+
+
 
 		/// <summary>
 		/// The m_min contour length allowed.
@@ -71,7 +82,7 @@ public class MarkerDetector
 		/// </summary>
 		/// <param name="camMatrix">Cam matrix.</param>
 		/// <param name="distCoeff">Dist coeff.</param>
-		public MarkerDetector (Mat camMatrix, Mat distCoeff)
+		public MarkerDetector (Mat camMatrix, Mat distCoeff, MarkerDesign markerDesign)
 		{
 				m_minContourLengthAllowed = 100;
 				markerSize = new Size (100, 100);
@@ -99,6 +110,19 @@ public class MarkerDetector
 				m_markerCorners2dList.Add (new Point (0, markerSize.height - 1));
 
 				m_markerCorners2d.fromList (m_markerCorners2dList);
+
+				if (markerDesign != null) {
+						m_markerDesign = new byte[markerDesign.gridSize, markerDesign.gridSize];
+						for (int y = 0; y < m_markerDesign.GetLength(0); y++) {
+								for (int x = 0; x < m_markerDesign.GetLength(1); x++) {
+										if (markerDesign.data [y*markerDesign.gridSize + x]) {
+												m_markerDesign [y, x] = 0;
+										} else {
+												m_markerDesign [y, x] = 1;
+										}
+								}
+						}
+				}
 		}
 
 		/// <summary>
@@ -303,7 +327,7 @@ public class MarkerDetector
 				approxCurve.Dispose ();
 
 		        
-                //Debug.Log ("possibleMarkers " + possibleMarkers.Count);
+				//Debug.Log ("possibleMarkers " + possibleMarkers.Count);
 		
 		
 				// Remove these elements which corners are too close to each other.
@@ -363,11 +387,11 @@ public class MarkerDetector
 				}
 		}
 
-	    /// <summary>
-	    /// Recognizes the markers.
-	    /// </summary>
-	    /// <param name="grayscale">Grayscale.</param>
-	    /// <param name="detectedMarkers">Detected markers.</param>
+		/// <summary>
+		/// Recognizes the markers.
+		/// </summary>
+		/// <param name="grayscale">Grayscale.</param>
+		/// <param name="detectedMarkers">Detected markers.</param>
 		void recognizeMarkers (Mat grayscale, List<Marker> detectedMarkers)
 		{
 				List<Marker> goodMarkers = new List<Marker> ();
@@ -385,7 +409,7 @@ public class MarkerDetector
 						Imgproc.warpPerspective (grayscale, canonicalMarkerImage, markerTransform, markerSize);
 			
 						MatOfInt nRotations = new MatOfInt (0);
-						int id = Marker.getMarkerId (canonicalMarkerImage, nRotations);
+						int id = Marker.getMarkerId (canonicalMarkerImage, nRotations, m_markerDesign);
 						if (id != - 1) {
 								marker.id = id;
 //				                Debug.Log ("id " + id);
@@ -393,7 +417,7 @@ public class MarkerDetector
 								//sort the points so that they are always in the same order no matter the camera orientation
 								List<Point> MarkerPointsList = marker.points.toList ();
 
-				//				std::rotate(marker.points.begin(), marker.points.begin() + 4 - nRotations, marker.points.end());
+								//				std::rotate(marker.points.begin(), marker.points.begin() + 4 - nRotations, marker.points.end());
 								MarkerPointsList = MarkerPointsList.Skip (4 - nRotations.toArray () [0]).Concat (MarkerPointsList.Take (4 - nRotations.toArray () [0])).ToList ();
 
 								marker.points.fromList (MarkerPointsList);
@@ -449,10 +473,10 @@ public class MarkerDetector
 
 		}
 
-	    /// <summary>
-	    /// Estimates the position.
-	    /// </summary>
-	    /// <param name="detectedMarkers">Detected markers.</param>
+		/// <summary>
+		/// Estimates the position.
+		/// </summary>
+		/// <param name="detectedMarkers">Detected markers.</param>
 		void estimatePosition (List<Marker> detectedMarkers)
 		{
 
@@ -491,10 +515,10 @@ public class MarkerDetector
 				}
 		}
 
-	    /// <summary>
-	    /// Perimeter the specified a.
-	    /// </summary>
-	    /// <param name="a">The alpha component.</param>
+		/// <summary>
+		/// Perimeter the specified a.
+		/// </summary>
+		/// <param name="a">The alpha component.</param>
 		float perimeter (MatOfPoint a)
 		{
 				List<Point> aList = a.toList ();
@@ -513,12 +537,12 @@ public class MarkerDetector
 				return sum;
 		}
 		
-	    /// <summary>
-	    /// Ises the into.
-	    /// </summary>
-	    /// <returns><c>true</c>, if into was ised, <c>false</c> otherwise.</returns>
-	    /// <param name="contour">Contour.</param>
-	    /// <param name="b">The blue component.</param>
+		/// <summary>
+		/// Ises the into.
+		/// </summary>
+		/// <returns><c>true</c>, if into was ised, <c>false</c> otherwise.</returns>
+		/// <param name="contour">Contour.</param>
+		/// <param name="b">The blue component.</param>
 		bool isInto (MatOfPoint2f contour, List<Point> b)
 		{
 				for (int i=0; i<b.Count; i++) {
