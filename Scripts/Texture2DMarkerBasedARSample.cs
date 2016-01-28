@@ -21,9 +21,9 @@ namespace MarkerBasedARSample
 				/// </summary>
 				public Camera ARCamera;
 
-		        /// <summary>
-		        /// The marker design.
-		        /// </summary>
+				/// <summary>
+				/// The marker design.
+				/// </summary>
 				public MarkerDesign markerDesign;
 
 				// Use this for initialization
@@ -31,7 +31,24 @@ namespace MarkerBasedARSample
 				{
 
 						gameObject.transform.localScale = new Vector3 (imgTexture.width, imgTexture.height, 1);
-						Camera.main.orthographicSize = imgTexture.height / 2;
+						Debug.Log ("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
+			
+						float width = 0;
+						float height = 0;
+			
+						width = gameObject.transform.localScale.x;
+						height = gameObject.transform.localScale.y;
+
+						float imageScale = 1.0f;
+						float widthScale = (float)Screen.width / width;
+						float heightScale = (float)Screen.height / height;
+						if (widthScale < heightScale) {
+								Camera.main.orthographicSize = (width * (float)Screen.height / (float)Screen.width) / 2;
+								imageScale = (float)Screen.height / (float)Screen.width;
+						} else {
+								Camera.main.orthographicSize = height / 2;
+						}
+						
 
 		
 						Mat imgMat = new Mat (imgTexture.height, imgTexture.width, CvType.CV_8UC4);
@@ -40,7 +57,7 @@ namespace MarkerBasedARSample
 						Debug.Log ("imgMat dst ToString " + imgMat.ToString ());
 
 						//set cameraparam
-						int max_d = Mathf.Max (imgMat.rows (), imgMat.cols ());
+						int max_d = (int)Mathf.Max (imgMat.rows (), imgMat.cols ());
 						Mat camMatrix = new Mat (3, 3, CvType.CV_64FC1);
 						camMatrix.put (0, 0, max_d);
 						camMatrix.put (0, 1, 0);
@@ -58,7 +75,7 @@ namespace MarkerBasedARSample
 
 
 						//calibration camera
-						Size imageSize = new Size (imgMat.cols (), imgMat.rows ());
+						Size imageSize = new Size (imgMat.cols () * imageScale, imgMat.rows () * imageScale);
 						double apertureWidth = 0;
 						double apertureHeight = 0;
 						double[] fovx = new double[1];
@@ -79,7 +96,11 @@ namespace MarkerBasedARSample
 						Debug.Log ("aspectratio " + aspectratio [0]);
 
 						//Adjust Unity Camera FOV
-						ARCamera.fieldOfView = (float)fovy [0];
+						if (Screen.height > Screen.width) {
+								ARCamera.fieldOfView = (float)fovx [0];
+						} else {
+								ARCamera.fieldOfView = (float)fovy [0];
+						}
 
 //			ARCamera.projectionMatrix = ARCamera.projectionMatrix * Matrix4x4.Scale(new Vector3(-1, -1, 1));
 //			gameObject.transform.localScale = new Vector3 (-1 * gameObject.transform.localScale.x, -1 * gameObject.transform.localScale.y, 1);

@@ -18,8 +18,6 @@ namespace MarkerBasedARSample
 		{
 			
 		}
-		
-		private Vector2 scrollViewVector = Vector2.zero;
 
 		public void OnBackButton ()
 		{
