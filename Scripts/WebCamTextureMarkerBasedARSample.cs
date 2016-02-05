@@ -200,7 +200,7 @@ namespace MarkerBasedARSample
 				void Update ()
 				{
 
-						if (webCamTextureToMatHelper.isPlaying ()) {
+						if (webCamTextureToMatHelper.isPlaying () && webCamTextureToMatHelper.didUpdateThisFrame ()) {
 				
 								Mat rgbaMat = webCamTextureToMatHelper.GetMat ();
 
