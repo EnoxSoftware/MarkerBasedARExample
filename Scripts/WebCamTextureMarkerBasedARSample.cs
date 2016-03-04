@@ -77,7 +77,7 @@ namespace MarkerBasedARSample
 				{
 
 						webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
-						webCamTextureToMatHelper.Init (OnWebCamTextureToMatHelperInited, OnWebCamTextureToMatHelperDisposed);
+						webCamTextureToMatHelper.Init ();
 
 				}
 
@@ -282,7 +282,7 @@ namespace MarkerBasedARSample
 				/// </summary>
 				public void OnChangeCameraButton ()
 				{
-						webCamTextureToMatHelper.Init (null, webCamTextureToMatHelper.requestWidth, webCamTextureToMatHelper.requestHeight, !webCamTextureToMatHelper.requestIsFrontFacing, OnWebCamTextureToMatHelperInited, OnWebCamTextureToMatHelperDisposed);
+						webCamTextureToMatHelper.Init (null, webCamTextureToMatHelper.requestWidth, webCamTextureToMatHelper.requestHeight, !webCamTextureToMatHelper.requestIsFrontFacing);
 				}
 
 				/// <summary>

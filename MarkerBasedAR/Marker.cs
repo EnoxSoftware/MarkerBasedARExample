@@ -57,7 +57,7 @@ public class Marker
 
 				int dist = 0;
 
-				int size = markerDesign.GetLength(0);
+				int size = markerDesign.GetLength (0);
 
 				byte[] b = new byte[size * size];
 
@@ -69,7 +69,7 @@ public class Marker
 						
 						for (int x=0; x<size; x++) {
 					
-								sum += (b [y*size + x] == markerDesign [y,x]) ? 0 : 1;
+								sum += (b [y * size + x] == markerDesign [y, x]) ? 0 : 1;
 						}
 						
 						dist += sum;
@@ -119,7 +119,7 @@ public class Marker
 				//Markers  are divided in 7x7 regions, of which the inner 5x5 belongs to marker info
 				//the external border should be entirely black
 
-				int size = markerDesign.GetLength(0);
+				int size = markerDesign.GetLength (0);
 		
 				int cellSize = markerImage.rows () / (size + 2);
 		
@@ -222,16 +222,16 @@ public class Marker
 
 				int thickness = 2;
 
-#if OPENCV_3
-				Imgproc.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
-                Imgproc.line(image, pointsArray[1], pointsArray[2], color, thickness, Core.LINE_AA, 0);
-                Imgproc.line(image, pointsArray[2], pointsArray[3], color, thickness, Core.LINE_AA, 0);
-                Imgproc.line(image, pointsArray[3], pointsArray[0], color, thickness, Core.LINE_AA, 0);
+#if OPENCV_2
+		Core.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
+		Core.line (image, pointsArray [1], pointsArray [2], color, thickness, Core.LINE_AA, 0);
+		Core.line (image, pointsArray [2], pointsArray [3], color, thickness, Core.LINE_AA, 0);
+		Core.line (image, pointsArray [3], pointsArray [0], color, thickness, Core.LINE_AA, 0);
 #else
-				Core.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [1], pointsArray [2], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [2], pointsArray [3], color, thickness, Core.LINE_AA, 0);
-				Core.line (image, pointsArray [3], pointsArray [0], color, thickness, Core.LINE_AA, 0);
+				Imgproc.line (image, pointsArray [0], pointsArray [1], color, thickness, Core.LINE_AA, 0);
+				Imgproc.line (image, pointsArray [1], pointsArray [2], color, thickness, Core.LINE_AA, 0);
+				Imgproc.line (image, pointsArray [2], pointsArray [3], color, thickness, Core.LINE_AA, 0);
+				Imgproc.line (image, pointsArray [3], pointsArray [0], color, thickness, Core.LINE_AA, 0);
 #endif
 
 		}
