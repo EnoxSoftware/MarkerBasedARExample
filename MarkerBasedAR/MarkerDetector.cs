@@ -10,7 +10,7 @@ using OpenCVForUnity;
 /// </summary>
 public class MarkerDetector
 {
-		public byte[,] m_markerDesign = 
+		private byte[,] m_markerDesign = 
 	{
 		{1,0,0,0,0},
 		{0,1,1,1,0},
@@ -19,6 +19,7 @@ public class MarkerDetector
 		{1,0,1,1,1}
 		
 	};
+		private List<byte[,]> m_markerDesigns;
 
 
 
@@ -43,9 +44,9 @@ public class MarkerDetector
 		private MatOfDouble distCoeff = new MatOfDouble ();
 
 		/// <summary>
-		/// The m_transformations.
+		/// The m_find markers.
 		/// </summary>
-		private List<Matrix4x4> m_transformations = new List<Matrix4x4> ();
+		private List<Marker> m_findMarkers = new List<Marker> ();
 
 		/// <summary>
 		/// The m_grayscale image.
@@ -82,7 +83,7 @@ public class MarkerDetector
 		/// </summary>
 		/// <param name="camMatrix">Cam matrix.</param>
 		/// <param name="distCoeff">Dist coeff.</param>
-		public MarkerDetector (Mat camMatrix, Mat distCoeff, MarkerDesign markerDesign)
+		public MarkerDetector (Mat camMatrix, Mat distCoeff, MarkerDesign[] markerDesigns)
 		{
 				m_minContourLengthAllowed = 100;
 				markerSize = new Size (100, 100);
@@ -111,17 +112,24 @@ public class MarkerDetector
 
 				m_markerCorners2d.fromList (m_markerCorners2dList);
 
-				if (markerDesign != null) {
-						m_markerDesign = new byte[markerDesign.gridSize, markerDesign.gridSize];
-						for (int y = 0; y < m_markerDesign.GetLength(0); y++) {
-								for (int x = 0; x < m_markerDesign.GetLength(1); x++) {
-										if (markerDesign.data [y*markerDesign.gridSize + x]) {
-												m_markerDesign [y, x] = 0;
-										} else {
-												m_markerDesign [y, x] = 1;
+				if (markerDesigns != null) {
+						m_markerDesigns = new List<byte[,]> ();
+						for (int i = 0; i < markerDesigns.Length; i++) {
+								byte[,] tmp_markerDesign = new byte[markerDesigns[i].gridSize, markerDesigns[i].gridSize];
+								for (int y = 0; y < tmp_markerDesign.GetLength(0); y++) {
+										for (int x = 0; x < tmp_markerDesign.GetLength(1); x++) {
+												if (markerDesigns[i].data [y * markerDesigns[i].gridSize + x]) {
+														tmp_markerDesign [y, x] = 0;
+												} else {
+														tmp_markerDesign [y, x] = 1;
+												}
 										}
 								}
+								m_markerDesigns.Add (tmp_markerDesign);
 						}
+				} else {
+						m_markerDesigns = new List<byte[,]> ();
+						m_markerDesigns.Add (m_markerDesign);
 				}
 		}
 
@@ -143,9 +151,9 @@ public class MarkerDetector
 
 //				Debug.Log ("markers " + markers  .Count);
 		
-				m_transformations.Clear ();
+				m_findMarkers.Clear ();
 				for (int i=0; i<markers.Count; i++) {
-						m_transformations.Add (markers [i].transformation);
+						m_findMarkers.Add (markers [i]);
 				}
 		}
 
@@ -153,9 +161,9 @@ public class MarkerDetector
 		/// Gets the transformations.
 		/// </summary>
 		/// <returns>The transformations.</returns>
-		public List<Matrix4x4> getTransformations ()
+		public List<Marker> getFindMarkers ()
 		{
-				return m_transformations;
+				return m_findMarkers;
 		}
 
 		/// <summary>
@@ -407,24 +415,26 @@ public class MarkerDetector
 
 						// Transform image to get a canonical marker image
 						Imgproc.warpPerspective (grayscale, canonicalMarkerImage, markerTransform, markerSize);
-			
-						MatOfInt nRotations = new MatOfInt (0);
-						int id = Marker.getMarkerId (canonicalMarkerImage, nRotations, m_markerDesign);
-						if (id != - 1) {
-								marker.id = id;
+
+						for (int p=0; p<m_markerDesigns.Count; p++) {
+								MatOfInt nRotations = new MatOfInt (0);
+								int id = Marker.getMarkerId (canonicalMarkerImage, nRotations, m_markerDesigns [p]);
+								if (id != - 1) {
+										marker.id = id;
 //				                Debug.Log ("id " + id);
 
-								//sort the points so that they are always in the same order no matter the camera orientation
-								List<Point> MarkerPointsList = marker.points.toList ();
+										//sort the points so that they are always in the same order no matter the camera orientation
+										List<Point> MarkerPointsList = marker.points.toList ();
 
-								//				std::rotate(marker.points.begin(), marker.points.begin() + 4 - nRotations, marker.points.end());
-								MarkerPointsList = MarkerPointsList.Skip (4 - nRotations.toArray () [0]).Concat (MarkerPointsList.Take (4 - nRotations.toArray () [0])).ToList ();
+										//				std::rotate(marker.points.begin(), marker.points.begin() + 4 - nRotations, marker.points.end());
+										MarkerPointsList = MarkerPointsList.Skip (4 - nRotations.toArray () [0]).Concat (MarkerPointsList.Take (4 - nRotations.toArray () [0])).ToList ();
 
-								marker.points.fromList (MarkerPointsList);
+										marker.points.fromList (MarkerPointsList);
 				
-								goodMarkers.Add (marker);
+										goodMarkers.Add (marker);
+								}
+								nRotations.Dispose ();
 						}
-						nRotations.Dispose ();
 				}
 
 //				Debug.Log ("goodMarkers " + goodMarkers.Count);

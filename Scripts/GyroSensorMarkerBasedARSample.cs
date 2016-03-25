@@ -7,10 +7,10 @@ using OpenCVForUnity;
 namespace MarkerBasedARSample
 {
 		/// <summary>
-		/// Web cam texture marker based AR sample.
+		/// Gyro Sensor Marker based AR sample.
 		/// </summary>
 		[RequireComponent(typeof(WebCamTextureToMatHelper))]
-		public class WebCamTextureMarkerBasedARSample : MonoBehaviour
+		public class GyroSensorMarkerBasedARSample : MonoBehaviour
 		{
 
 				/// <summary>
@@ -69,16 +69,14 @@ namespace MarkerBasedARSample
 				public MarkerSettings[] markerSettings;
 
 				/// <summary>
-				/// The should move AR camera.
-				/// </summary>
-				[Tooltip("If true, only the first element of markerSettings will be processed.")]
-				public bool
-						shouldMoveARCamera;
-
-				/// <summary>
 				/// The web cam texture to mat helper.
 				/// </summary>
 				WebCamTextureToMatHelper webCamTextureToMatHelper;
+
+
+#if UNITY_EDITOR
+                private Vector3 rot;
+#endif
 		
 				// Use this for initialization
 				void Start ()
@@ -87,6 +85,11 @@ namespace MarkerBasedARSample
 						webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
 						webCamTextureToMatHelper.Init ();
 
+#if UNITY_EDITOR
+                        rot = ARCamera.transform.rotation.eulerAngles;
+#else
+						Input.gyro.enabled = true;
+#endif
 				}
 
 				/// <summary>
@@ -124,7 +127,10 @@ namespace MarkerBasedARSample
 						}
 			
 						gameObject.GetComponent<Renderer> ().material.mainTexture = texture;
-
+			
+			
+			
+			
 			
 						//set cameraparam
 						int max_d = Mathf.Max (webCamTextureMat.rows (), webCamTextureMat.cols ());
@@ -206,7 +212,9 @@ namespace MarkerBasedARSample
 				{
 
 						if (webCamTextureToMatHelper.isPlaying () && webCamTextureToMatHelper.didUpdateThisFrame ()) {
-				
+
+								UpdateARCameraTransform ();
+
 								Mat rgbaMat = webCamTextureToMatHelper.GetMat ();
 
 								//for frontFaceingCamera
@@ -220,68 +228,74 @@ namespace MarkerBasedARSample
 										settings.setAllARGameObjectsDisable ();
 								}
 				
-								if (shouldMoveARCamera) {
-										List<Marker> findMarkers = markerDetector.getFindMarkers ();
-										if (findMarkers.Count > 0) {
 
-												Marker marker = findMarkers [0];
-
-												if (markerSettings.Length > 0) {
-														MarkerSettings settings = markerSettings [0];
+								List<Marker> findMarkers = markerDetector.getFindMarkers ();
+								for (int i = 0; i < findMarkers.Count; i++) {
+										Marker marker = findMarkers [i];
 					
-														if (marker.id == settings.getMarkerId ()) {
-																transformationM = marker.transformation;
+										foreach (MarkerSettings settings in markerSettings) {
+												if (marker.id == settings.getMarkerId ()) {
+														transformationM = marker.transformation;
 //														Debug.Log ("transformationM " + transformationM.ToString ());
+							
+														ARM = ARCamera.transform.localToWorldMatrix * invertYM * transformationM * invertZM;
+//														Debug.Log ("arM " + arM.ToString ());
+							
 
-						
-																GameObject ARGameObject = settings.getARGameObject ();
-																if (ARGameObject != null) {
-																		ARM = ARGameObject.transform.localToWorldMatrix * invertZM * transformationM.inverse * invertYM;
-																		//Debug.Log ("arM " + arM.ToString ());
-																		ARGameObject.SetActive (true);
-																		ARUtils.SetTransformFromMatrix (ARCamera.transform, ref ARM);
-																}
-																
-														}
-												}
-										}
-								} else {
-
-										List<Marker> findMarkers = markerDetector.getFindMarkers ();
-										for (int i = 0; i < findMarkers.Count; i++) {
-												Marker marker = findMarkers [i];
-					
-												foreach (MarkerSettings settings in markerSettings) {
-														if (marker.id == settings.getMarkerId ()) {
-																transformationM = marker.transformation;
-//																Debug.Log ("transformationM " + transformationM.ToString ());
-
-																ARM = ARCamera.transform.localToWorldMatrix * invertYM * transformationM * invertZM;
-																//Debug.Log ("arM " + arM.ToString ());
-
-																GameObject ARGameObject = settings.getARGameObject ();
-																if (ARGameObject != null) {
-																		
-																		ARUtils.SetTransformFromMatrix (ARGameObject.transform, ref ARM);
-																		ARGameObject.SetActive (true);
-																}
+														GameObject ARGameObject = settings.getARGameObject ();
+														if (ARGameObject != null) {
+																ARUtils.SetTransformFromMatrix (ARGameObject.transform, ref ARM);
+																ARGameObject.SetActive (true);
 														}
 												}
 										}
 								}
+
 				
 
 								Utils.matToTexture2D (rgbaMat, texture, colors);
 						}
 			
 				}
-		
+
+				public void UpdateARCameraTransform ()
+				{
+#if UNITY_EDITOR
+                        float spd = Time.deltaTime * 100.0f;
+                        if (Input.GetKey(KeyCode.LeftArrow))
+                        {
+                               rot.y -= spd;
+                        }
+                        if (Input.GetKey(KeyCode.RightArrow))
+                        {
+                               rot.y += spd;
+                        }
+                        if (Input.GetKey(KeyCode.UpArrow))
+                        {
+                               rot.x -= spd;
+                        }
+                        if (Input.GetKey(KeyCode.DownArrow))
+                        {
+                               rot.x += spd;
+                        }
+                        ARCamera.transform.rotation = Quaternion.Euler(rot);
+#else
+						ARCamera.transform.rotation = Quaternion.AngleAxis (90.0f, Vector3.right) * Input.gyro.attitude * Quaternion.AngleAxis (180.0f, Vector3.forward);
+#endif
+				}
+
+
 				/// <summary>
 				/// Raises the disable event.
 				/// </summary>
 				void OnDisable ()
 				{
 						webCamTextureToMatHelper.Dispose ();
+
+#if UNITY_EDITOR
+#else
+						Input.gyro.enabled = false;
+#endif
 				}
 		
 				/// <summary>

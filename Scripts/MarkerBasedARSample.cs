@@ -22,6 +22,11 @@ namespace MarkerBasedARSample
 		{
 			Application.LoadLevel ("ShowLicense");
 		}
+
+		public void OnShowARMarkerButton ()
+		{
+			Application.LoadLevel ("ShowARMarker");
+		}
 		
 		public void OnTexture2DMarkerBasedARSample ()
 		{
@@ -31,6 +36,11 @@ namespace MarkerBasedARSample
 		public void OnWebCamTextureMarkerBasedARSample ()
 		{
 			Application.LoadLevel ("WebCamTextureMarkerBasedARSample");
+		}
+
+		public void OnGyroSensorMarkerBasedARSample ()
+		{
+			Application.LoadLevel ("GyroSensorMarkerBasedARSample");
 		}
 	}
 }

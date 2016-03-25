@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 using OpenCVForUnity;
 
 namespace MarkerBasedARSample
 {
 /// <summary>
-/// Marker based AR sample.
+/// Texture2D Marker based AR sample.
 /// https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR by using "OpenCV for Unity"
 /// </summary>
 		public class Texture2DMarkerBasedARSample : MonoBehaviour
@@ -22,9 +23,17 @@ namespace MarkerBasedARSample
 				public Camera ARCamera;
 
 				/// <summary>
-				/// The marker design.
+				/// The marker settings.
 				/// </summary>
-				public MarkerDesign markerDesign;
+				public MarkerSettings[] markerSettings;
+
+				/// <summary>
+				/// The should move AR camera.
+				/// </summary>
+				[Tooltip("If true, only the first element of markerSettings will be processed.")]
+				public bool
+						shouldMoveARCamera;
+		
 
 				// Use this for initialization
 				void Start ()
@@ -96,45 +105,90 @@ namespace MarkerBasedARSample
 						Debug.Log ("aspectratio " + aspectratio [0]);
 
 						//Adjust Unity Camera FOV
-						if (Screen.height > Screen.width) {
+						if (widthScale < heightScale) {
 								ARCamera.fieldOfView = (float)fovx [0];
 						} else {
 								ARCamera.fieldOfView = (float)fovy [0];
 						}
 
-//			ARCamera.projectionMatrix = ARCamera.projectionMatrix * Matrix4x4.Scale(new Vector3(-1, -1, 1));
-//			gameObject.transform.localScale = new Vector3 (-1 * gameObject.transform.localScale.x, -1 * gameObject.transform.localScale.y, 1);
 
-
+						MarkerDesign[] markerDesigns = new MarkerDesign[markerSettings.Length];
+						for (int i = 0; i < markerDesigns.Length; i++) {
+								markerDesigns [i] = markerSettings [i].markerDesign;
+						}
 		 
-						MarkerDetector markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesign);
+						MarkerDetector markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesigns);
 
 						markerDetector.processFrame (imgMat, 1);
 
 
-						//Marker Coordinate Initial Matrix
-						Matrix4x4 lookAtM = getLookAtMatrix (new Vector3 (0, 0, 0), new Vector3 (0, 0, 1), new Vector3 (0, -1, 0));
-						Debug.Log ("lookAt " + lookAtM.ToString ());
-
-						//Marker to Camera Coordinate System Convert Matrix
-						if (markerDetector.getTransformations ().Count > 0) {
-								Matrix4x4 transformationM = markerDetector.getTransformations () [0];
-								Debug.Log ("transformationM " + transformationM.ToString ());
-
-								//OpenGL to Unity Coordinate System Convert Matrix
-								//http://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html that camera space matches OpenGL convention: camera's forward is the negative Z axis. This is different from Unity's convention, where forward is the positive Z axis. 
-								Matrix4x4 invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
-								Debug.Log ("invertZM " + invertZM.ToString ());
-
-								Matrix4x4 worldToCameraM = lookAtM * transformationM * invertZM;
-								Debug.Log ("worldToCameraM " + worldToCameraM.ToString ());
-
-								ARCamera.worldToCameraMatrix = worldToCameraM;
-		
-						} else {
-								Debug.LogWarning ("Marker is not detected");
+						foreach (MarkerSettings settings in markerSettings) {
+								settings.setAllARGameObjectsDisable ();
 						}
 
+
+						if (shouldMoveARCamera) {
+
+								List<Marker> findMarkers = markerDetector.getFindMarkers ();
+								if (findMarkers.Count > 0) {
+					
+										Marker marker = findMarkers [0];
+				
+										if (markerSettings.Length > 0) {
+												MarkerSettings settings = markerSettings [0];
+					
+												if (marker.id == settings.getMarkerId ()) {
+														Matrix4x4 transformationM = marker.transformation;
+														Debug.Log ("transformationM " + transformationM.ToString ());
+							
+														Matrix4x4 invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
+														Debug.Log ("invertZM " + invertZM.ToString ());
+		
+														Matrix4x4 invertYM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, -1, 1));
+														Debug.Log ("invertYM " + invertYM.ToString ());
+							
+														
+
+														GameObject ARGameObject = settings.getARGameObject ();
+														if (ARGameObject != null) {
+																Matrix4x4 ARM = ARGameObject.transform.localToWorldMatrix * invertZM * transformationM.inverse * invertYM;
+																Debug.Log ("ARM " + ARM.ToString ());
+																ARGameObject.SetActive (true);
+																ARUtils.SetTransformFromMatrix (ARCamera.transform, ref ARM);
+														}
+														
+												}
+										}
+								}
+						} else {
+								List<Marker> findMarkers = markerDetector.getFindMarkers ();
+								for (int i = 0; i < findMarkers.Count; i++) {
+										Marker marker = findMarkers [i];
+
+										foreach (MarkerSettings settings in markerSettings) {
+												if (marker.id == settings.getMarkerId ()) {
+														Matrix4x4 transformationM = marker.transformation;
+														Debug.Log ("transformationM " + transformationM.ToString ());
+
+														
+														Matrix4x4 invertYM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, -1, 1));
+														Debug.Log ("invertYM " + invertYM.ToString ());
+					
+														Matrix4x4 invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
+														Debug.Log ("invertZM " + invertZM.ToString ());
+					
+														Matrix4x4 ARM = ARCamera.transform.localToWorldMatrix * invertYM * transformationM * invertZM;
+														Debug.Log ("ARM " + ARM.ToString ());
+					
+														GameObject ARGameObject = settings.getARGameObject ();
+														if (ARGameObject != null) {
+																ARUtils.SetTransformFromMatrix (ARGameObject.transform, ref ARM);
+																ARGameObject.SetActive (true);
+														}
+												}
+										}
+								}
+						}
 
 
 						Texture2D texture = new Texture2D (imgMat.cols (), imgMat.rows (), TextureFormat.RGBA32, false);
@@ -150,32 +204,10 @@ namespace MarkerBasedARSample
 	
 				}
 
-				/// <summary>
-				/// Gets the lookAt matrix.
-				/// </summary>
-				/// <returns>The look at matrix.</returns>
-				/// <param name="pos">Position.</param>
-				/// <param name="target">Target.</param>
-				/// <param name="up">Up.</param>
-				private Matrix4x4 getLookAtMatrix (Vector3 pos, Vector3 target, Vector3 up)
-				{
-		
-						Vector3 z = Vector3.Normalize (pos - target);
-						Vector3 x = Vector3.Normalize (Vector3.Cross (up, z));
-						Vector3 y = Vector3.Normalize (Vector3.Cross (z, x));
-		
-						Matrix4x4 result = new Matrix4x4 ();
-						result.SetRow (0, new Vector4 (x.x, x.y, x.z, -(Vector3.Dot (pos, x))));
-						result.SetRow (1, new Vector4 (y.x, y.y, y.z, -(Vector3.Dot (pos, y))));
-						result.SetRow (2, new Vector4 (z.x, z.y, z.z, -(Vector3.Dot (pos, z))));
-						result.SetRow (3, new Vector4 (0, 0, 0, 1));
-		
-						return result;
-				}
-
 				public void OnBackButton ()
 				{
 						Application.LoadLevel ("MarkerBasedARSample");
 				}
+
 		}
 }

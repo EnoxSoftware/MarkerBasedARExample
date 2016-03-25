@@ -84,20 +84,24 @@ public class Marker
 		/// <param name="bits">Bits.</param>
 		public static int mat2id (Mat bits)
 		{
-				int val = 0;
-
+				int id = 0;
 				int size = bits.rows ();
+				byte[] data = new byte[size * size];
+				bits.get (0, 0, data);
 				for (int y=0; y<size; y++) {
-						val <<= 1;
-						if (bits.get (y, 1) [0] == 1)
-								val |= 1;
-
-						val <<= 1;
-						if (bits.get (y, size - 2) [0] == 1)
-								val |= 1;
-
+						int lineId = y;
+						for (int x=0; x<size; x++) {
+								if (x > 0)
+										lineId <<= 1;
+								if (data [y * size + x] == 1)
+										lineId |= 1;
+						}
+						id ^= lineId;
+			
+//						Debug.Log ("lineId " + lineId);
+//						Debug.Log ("id " + id);
 				}
-				return val;
+				return id;
 		}
 
 		/// <summary>
