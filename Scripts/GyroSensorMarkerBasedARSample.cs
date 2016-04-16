@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using OpenCVForUnity;
+using OpenCVForUnity.MarkerBasedAR;
 
 namespace MarkerBasedARSample
 {
@@ -195,7 +196,11 @@ namespace MarkerBasedARSample
 						invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
 						Debug.Log ("invertZM " + invertZM.ToString ());
 						
-			
+
+						//if WebCamera is frontFaceing,flip Mat.
+						if (webCamTextureToMatHelper.GetWebCamDevice ().isFrontFacing) {
+								webCamTextureToMatHelper.flipHorizontal = true;
+						}
 				}
 		
 				/// <summary>
@@ -217,12 +222,8 @@ namespace MarkerBasedARSample
 
 								Mat rgbaMat = webCamTextureToMatHelper.GetMat ();
 
-								//for frontFaceingCamera
-//								Core.flip (rgbaMat, rgbaMat, 1);
-
 								markerDetector.processFrame (rgbaMat, 1);
-				
-								
+
 
 								foreach (MarkerSettings settings in markerSettings) {
 										settings.setAllARGameObjectsDisable ();

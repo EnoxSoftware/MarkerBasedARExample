@@ -2,80 +2,83 @@
 using UnityEditor;
 using System.Collections;
 
-[CustomPropertyDrawer(typeof(MarkerDesign))]
-public class MarkerDesignPropertyDrawer : PropertyDrawer
+namespace OpenCVForUnity.MarkerBasedAR
 {
-	public bool showPosition = true;
+		[CustomPropertyDrawer(typeof(MarkerDesign))]
+		public class MarkerDesignPropertyDrawer : PropertyDrawer
+		{
+				public bool showPosition = true;
 	
-	public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
-	{
+				public override void OnGUI (UnityEngine.Rect position, SerializedProperty property, GUIContent label)
+				{
 		
 		
-		//				Debug.Log (position.ToString ());
+						//				Debug.Log (position.ToString ());
 		
-		label = EditorGUI.BeginProperty (position, label, property);
+						label = EditorGUI.BeginProperty (position, label, property);
 		
-		showPosition = EditorGUI.Foldout (new Rect (position.x, position.y, position.width - 6, 18), showPosition, label);
+						showPosition = EditorGUI.Foldout (new UnityEngine.Rect (position.x, position.y, position.width - 6, 18), showPosition, label);
 		
-		if (showPosition) {
+						if (showPosition) {
 			
-			//				EditorGUI.PrefixLabel (position, label);
+								//				EditorGUI.PrefixLabel (position, label);
 			
-			int oldIndentLevel = EditorGUI.indentLevel;
-			EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
+								int oldIndentLevel = EditorGUI.indentLevel;
+								EditorGUI.indentLevel = EditorGUI.indentLevel + 1;
 			
-			position = EditorGUI.IndentedRect (position);
-			EditorGUI.indentLevel = 0;
+								position = EditorGUI.IndentedRect (position);
+								EditorGUI.indentLevel = 0;
 			
 			
-			Rect newposition = position;
+								UnityEngine.Rect newposition = position;
 			
-			//						Debug.Log (newposition.ToString ());
+								//						Debug.Log (newposition.ToString ());
 			
-			newposition.y += 18f;
+								newposition.y += 18f;
 			
-			SerializedProperty gridSize = property.FindPropertyRelative ("gridSize");
-			EditorGUI.PropertyField (new Rect (position.x, position.y + 18, position.width, 18), gridSize);
-			if (gridSize.intValue <= 0)
-				gridSize.intValue = 1;
+								SerializedProperty gridSize = property.FindPropertyRelative ("gridSize");
+								EditorGUI.PropertyField (new UnityEngine.Rect (position.x, position.y + 18, position.width, 18), gridSize);
+								if (gridSize.intValue <= 0)
+										gridSize.intValue = 1;
 			
-			newposition.y += 18f;
-			SerializedProperty data = property.FindPropertyRelative ("data");
+								newposition.y += 18f;
+								SerializedProperty data = property.FindPropertyRelative ("data");
 			
-			data.arraySize = gridSize.intValue * gridSize.intValue;
+								data.arraySize = gridSize.intValue * gridSize.intValue;
 			
-			newposition.width = 18f;
-			newposition.height = 18f;
+								newposition.width = 18f;
+								newposition.height = 18f;
 			
-			for (int j=0; j<gridSize.intValue; j++) {
+								for (int j=0; j<gridSize.intValue; j++) {
 				
-				newposition.x = position.x + (position.width - (newposition.width * gridSize.intValue)) / 2;
-				newposition.y += 18f;
+										newposition.x = position.x + (position.width - (newposition.width * gridSize.intValue)) / 2;
+										newposition.y += 18f;
 				
-				for (int i=0; i<gridSize.intValue; i++) {
+										for (int i=0; i<gridSize.intValue; i++) {
 					
-					EditorGUI.PropertyField (newposition, data.GetArrayElementAtIndex (j * gridSize.intValue + i), GUIContent.none);
-					newposition.x += newposition.width;
-				}
+												EditorGUI.PropertyField (newposition, data.GetArrayElementAtIndex (j * gridSize.intValue + i), GUIContent.none);
+												newposition.x += newposition.width;
+										}
 				
-			}
+								}
 			
-			EditorGUI.indentLevel = oldIndentLevel;
-		}
-		EditorGUI.EndProperty ();
-	}
+								EditorGUI.indentLevel = oldIndentLevel;
+						}
+						EditorGUI.EndProperty ();
+				}
 	
-	public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
-	{
+				public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
+				{
 		
-		if (showPosition) {
+						if (showPosition) {
 			
-			SerializedProperty gridSize = property.FindPropertyRelative ("gridSize");
+								SerializedProperty gridSize = property.FindPropertyRelative ("gridSize");
 			
-			return 18f * (gridSize.intValue + 3);
-		} else {
-			return 18f;
-		}
-	}
+								return 18f * (gridSize.intValue + 3);
+						} else {
+								return 18f;
+						}
+				}
 	
+		}
 }
