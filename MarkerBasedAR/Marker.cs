@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using OpenCVForUnity;
 
-namespace OpenCVForUnity.MarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
 
 /// <summary>

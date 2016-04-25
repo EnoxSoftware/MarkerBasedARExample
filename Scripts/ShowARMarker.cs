@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using OpenCVForUnity;
+#if UNITY_5_3
+using UnityEngine.SceneManagement;
+#endif
 
 namespace MarkerBasedARSample
 {
@@ -60,7 +62,11 @@ namespace MarkerBasedARSample
 				/// </summary>
 				public void OnBackButton ()
 				{
+						#if UNITY_5_3
+			SceneManager.LoadScene ("MarkerBasedARSample");
+						#else
 						Application.LoadLevel ("MarkerBasedARSample");
+#endif
 				}
 
 				/// <summary>

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace OpenCVForUnity.MarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
 		[System.Serializable]
 		public class MarkerDesign

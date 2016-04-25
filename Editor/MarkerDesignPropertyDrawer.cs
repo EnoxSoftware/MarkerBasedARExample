@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-namespace OpenCVForUnity.MarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
 		[CustomPropertyDrawer(typeof(MarkerDesign))]
 		public class MarkerDesignPropertyDrawer : PropertyDrawer

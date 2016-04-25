@@ -5,7 +5,7 @@ using System.Linq;
 
 using OpenCVForUnity;
 
-namespace OpenCVForUnity.MarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
 
 /// <summary>

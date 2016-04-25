@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace OpenCVForUnity.MarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
 		public class MarkerSettings : MonoBehaviour
 		{
