@@ -73,9 +73,9 @@ namespace MarkerBasedARSample
         WebCamTextureToMatHelper webCamTextureToMatHelper;
 
 
-#if UNITY_EDITOR
-                private Vector3 rot;
-#endif
+        #if UNITY_EDITOR
+        private Vector3 rot;
+        #endif
         
         // Use this for initialization
         void Start ()
@@ -84,11 +84,11 @@ namespace MarkerBasedARSample
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
             webCamTextureToMatHelper.Init ();
 
-#if UNITY_EDITOR
-                        rot = ARCamera.transform.rotation.eulerAngles;
-#else
+            #if UNITY_EDITOR
+            rot = ARCamera.transform.rotation.eulerAngles;
+            #else
             Input.gyro.enabled = true;
-#endif
+            #endif
         }
 
         /// <summary>
@@ -166,23 +166,22 @@ namespace MarkerBasedARSample
             Debug.Log ("principalPoint " + principalPoint.ToString ());
             Debug.Log ("aspectratio " + aspectratio [0]);
             
-            //To convert the difference of the FOV value of the OpenCV and Unity. 
+            // To convert the difference of the FOV value of the OpenCV and Unity. 
             double fovXScale = (2.0 * Mathf.Atan ((float)(imageSize.width / (2.0 * fx)))) / (Mathf.Atan2 ((float)cx, (float)fx) + Mathf.Atan2 ((float)(imageSize.width - cx), (float)fx));
             double fovYScale = (2.0 * Mathf.Atan ((float)(imageSize.height / (2.0 * fy)))) / (Mathf.Atan2 ((float)cy, (float)fy) + Mathf.Atan2 ((float)(imageSize.height - cy), (float)fy));
             
             Debug.Log ("fovXScale " + fovXScale);
             Debug.Log ("fovYScale " + fovYScale);
-            
-            
-            //Adjust Unity Camera FOV https://github.com/opencv/opencv/commit/8ed1945ccd52501f5ab22bdec6aa1f91f1e2cfd4
+
+
+            // Adjust Unity Camera FOV https://github.com/opencv/opencv/commit/8ed1945ccd52501f5ab22bdec6aa1f91f1e2cfd4
             if (widthScale < heightScale) {
                 ARCamera.fieldOfView = (float)(fovx [0] * fovXScale);
             } else {
                 ARCamera.fieldOfView = (float)(fovy [0] * fovYScale);
             }
-                        
-                                                    
-            
+
+
             MarkerDesign[] markerDesigns = new MarkerDesign[markerSettings.Length];
             for (int i = 0; i < markerDesigns.Length; i++) {
                 markerDesigns [i] = markerSettings [i].markerDesign;
@@ -191,7 +190,6 @@ namespace MarkerBasedARSample
             markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesigns);
 
 
-                        
             invertYM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, -1, 1));
             Debug.Log ("invertYM " + invertYM.ToString ());
             
@@ -228,9 +226,18 @@ namespace MarkerBasedARSample
 
 
                 foreach (MarkerSettings settings in markerSettings) {
-                    settings.setAllARGameObjectsDisable ();
+                    if(!settings.shouldNotSetToInactivePerFrame){
+                        settings.setAllARGameObjectsDisable ();
+                    }else{
+                        GameObject ARGameObject = settings.getARGameObject ();
+                        if (ARGameObject != null) {
+                            DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive>();
+                            if(obj != null){
+                                obj.SetActive(false, 0.5f);
+                            }
+                        }
+                    }
                 }
-                
 
                 List<Marker> findMarkers = markerDetector.getFindMarkers ();
                 for (int i = 0; i < findMarkers.Count; i++) {
@@ -239,54 +246,50 @@ namespace MarkerBasedARSample
                     foreach (MarkerSettings settings in markerSettings) {
                         if (marker.id == settings.getMarkerId ()) {
                             transformationM = marker.transformation;
-//                                                      Debug.Log ("transformationM " + transformationM.ToString ());
+                            //Debug.Log ("transformationM " + transformationM.ToString ());
                             
                             ARM = ARCamera.transform.localToWorldMatrix * invertYM * transformationM * invertZM;
-//                                                      Debug.Log ("arM " + arM.ToString ());
-                            
+                            //Debug.Log ("arM " + arM.ToString ());
 
                             GameObject ARGameObject = settings.getARGameObject ();
                             if (ARGameObject != null) {
                                 ARUtils.SetTransformFromMatrix (ARGameObject.transform, ref ARM);
-                                ARGameObject.SetActive (true);
+
+                                DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive>();
+                                if(obj != null){
+                                    obj.SetActive(true);
+                                }else{
+                                    ARGameObject.SetActive (true);
+                                }
                             }
                         }
                     }
                 }
-
-                
-
                 Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors());
             }
-            
         }
 
         public void UpdateARCameraTransform ()
         {
-#if UNITY_EDITOR
-                        float spd = Time.deltaTime * 100.0f;
-                        if (Input.GetKey(KeyCode.LeftArrow))
-                        {
-                               rot.y -= spd;
-                        }
-                        if (Input.GetKey(KeyCode.RightArrow))
-                        {
-                               rot.y += spd;
-                        }
-                        if (Input.GetKey(KeyCode.UpArrow))
-                        {
-                               rot.x -= spd;
-                        }
-                        if (Input.GetKey(KeyCode.DownArrow))
-                        {
-                               rot.x += spd;
-                        }
-                        ARCamera.transform.rotation = Quaternion.Euler(rot);
-#else
+            #if UNITY_EDITOR
+            float spd = Time.deltaTime * 100.0f;
+            if (Input.GetKey (KeyCode.LeftArrow)) {
+                rot.y -= spd;
+            }
+            if (Input.GetKey (KeyCode.RightArrow)) {
+                rot.y += spd;
+            }
+            if (Input.GetKey (KeyCode.UpArrow)) {
+                rot.x -= spd;
+            }
+            if (Input.GetKey (KeyCode.DownArrow)) {
+                rot.x += spd;
+            }
+            ARCamera.transform.rotation = Quaternion.Euler (rot);
+            #else
             ARCamera.transform.rotation = Quaternion.AngleAxis (90.0f, Vector3.right) * Input.gyro.attitude * Quaternion.AngleAxis (180.0f, Vector3.forward);
-#endif
+            #endif
         }
-
 
         /// <summary>
         /// Raises the disable event.
@@ -295,10 +298,10 @@ namespace MarkerBasedARSample
         {
             webCamTextureToMatHelper.Dispose ();
 
-#if UNITY_EDITOR
-#else
+            #if UNITY_EDITOR
+            #else
             Input.gyro.enabled = false;
-#endif
+            #endif
         }
         
         /// <summary>
@@ -310,7 +313,7 @@ namespace MarkerBasedARSample
             SceneManager.LoadScene ("MarkerBasedARSample");
             #else
             Application.LoadLevel ("MarkerBasedARSample");
-#endif
+            #endif
         }
         
         /// <summary>
@@ -346,5 +349,4 @@ namespace MarkerBasedARSample
         }
 
     }
-    
 }
