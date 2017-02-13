@@ -8,13 +8,13 @@ using UnityEngine.SceneManagement;
 using OpenCVForUnity;
 using OpenCVMarkerBasedAR;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
 /// <summary>
-/// Texture2D Marker based AR sample.
+/// Texture2D Marker based AR example.
 /// https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR by using "OpenCV for Unity"
 /// </summary>
-    public class Texture2DMarkerBasedARSample : MonoBehaviour
+    public class Texture2DMarkerBasedARExample : MonoBehaviour
     {
         /// <summary>
         /// The image texture.
@@ -219,9 +219,9 @@ namespace MarkerBasedARSample
         public void OnBackButton ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("MarkerBasedARSample");
+            SceneManager.LoadScene ("MarkerBasedARExample");
             #else
-            Application.LoadLevel ("MarkerBasedARSample");
+            Application.LoadLevel ("MarkerBasedARExample");
 #endif
         }
 

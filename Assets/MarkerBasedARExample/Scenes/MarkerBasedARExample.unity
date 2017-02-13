@@ -196,7 +196,7 @@ GameObject:
   - 114: {fileID: 324853198}
   - 114: {fileID: 324853197}
   m_Layer: 5
-  m_Name: Texture2DMarkerBasedARSample
+  m_Name: Texture2DMarkerBasedARExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 29440833}
-        m_MethodName: OnTexture2DMarkerBasedARSample
+        m_MethodName: OnTexture2DMarkerBasedARExample
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -336,7 +336,7 @@ GameObject:
   - 114: {fileID: 400731937}
   - 114: {fileID: 400731936}
   m_Layer: 5
-  m_Name: WebCamTextureMarkerBasedARSample
+  m_Name: WebCamTextureMarkerBasedARExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -421,7 +421,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 29440833}
-        m_MethodName: OnWebCamTextureMarkerBasedARSample
+        m_MethodName: OnWebCamTextureMarkerBasedARExample
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -575,7 +575,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GyroSensorMarkerBasedARSample
+  m_Text: GyroSensorMarkerBasedARExample
 --- !u!222 &481345896
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -662,7 +662,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WebCamTextureMarkerBasedARSample
+  m_Text: WebCamTextureMarkerBasedARExample
 --- !u!222 &637170506
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -919,7 +919,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Texture2DMarkerBasedARSample
+  m_Text: Texture2DMarkerBasedARExample
 --- !u!222 &795182949
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1495,7 +1495,7 @@ GameObject:
   - 114: {fileID: 1764919932}
   - 114: {fileID: 1764919931}
   m_Layer: 5
-  m_Name: GyroSensorMarkerBasedARSample
+  m_Name: GyroSensorMarkerBasedARExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1580,7 +1580,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 29440833}
-        m_MethodName: OnGyroSensorMarkerBasedARSample
+        m_MethodName: OnGyroSensorMarkerBasedARExample
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -8,13 +8,13 @@ using UnityEngine.SceneManagement;
 using OpenCVForUnity;
 using OpenCVMarkerBasedAR;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
     /// <summary>
-    /// Gyro Sensor Marker based AR sample.
+    /// Gyro Sensor Marker based AR example.
     /// </summary>
     [RequireComponent(typeof(WebCamTextureToMatHelper))]
-    public class GyroSensorMarkerBasedARSample : MonoBehaviour
+    public class GyroSensorMarkerBasedARExample : MonoBehaviour
     {
 
         /// <summary>
@@ -310,9 +310,9 @@ namespace MarkerBasedARSample
         public void OnBackButton ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("MarkerBasedARSample");
+            SceneManager.LoadScene ("MarkerBasedARExample");
             #else
-            Application.LoadLevel ("MarkerBasedARSample");
+            Application.LoadLevel ("MarkerBasedARExample");
             #endif
         }
         

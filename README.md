@@ -1,9 +1,9 @@
-MarkerBased AR Sample
+MarkerBased AR Example
 ====================
 
 Overview
 -----
-<http://u3d.as/content/enox-software/marker-based-ar-sample>  
+<https://www.assetstore.unity3d.com/#!/content/29678>  
 
 Setup Tutorial & Demo Video
 -----
@@ -12,13 +12,13 @@ Setup Tutorial & Demo Video
 Demo
 -----
 - WebGL
-<https://enoxsoftware.github.io/MarkerBasedARSample/webgl_sample/index.html>
+<https://enoxsoftware.github.io/MarkerBasedARExample/webgl_example/index.html>
 - Android
-<https://play.google.com/store/apps/details?id=com.enoxsoftware.markerbasedarsample>
+<https://play.google.com/store/apps/details?id=com.enoxsoftware.markerbasedarexample>
 
 Manual
 -----
-[ReadMe.pdf](/MarkerBasedARSample/ReadMe.pdf)
+[ReadMe.pdf](/Assets/MarkerBasedARExample/ReadMe.pdf)
 
 
 

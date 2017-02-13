@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
 /// <summary>
 /// AR utils.

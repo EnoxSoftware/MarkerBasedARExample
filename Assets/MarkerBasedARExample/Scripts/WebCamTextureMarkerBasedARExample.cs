@@ -8,13 +8,13 @@ using UnityEngine.SceneManagement;
 using OpenCVForUnity;
 using OpenCVMarkerBasedAR;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
     /// <summary>
-    /// Web cam texture marker based AR sample.
+    /// Web cam texture marker based AR example.
     /// </summary>
     [RequireComponent(typeof(WebCamTextureToMatHelper))]
-    public class WebCamTextureMarkerBasedARSample : MonoBehaviour
+    public class WebCamTextureMarkerBasedARExample : MonoBehaviour
     {
 
         /// <summary>
@@ -297,9 +297,9 @@ namespace MarkerBasedARSample
         public void OnBackButton ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("MarkerBasedARSample");
+            SceneManager.LoadScene ("MarkerBasedARExample");
             #else
-            Application.LoadLevel ("MarkerBasedARSample");
+            Application.LoadLevel ("MarkerBasedARExample");
 #endif
         }
         

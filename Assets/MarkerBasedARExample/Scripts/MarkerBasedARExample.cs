@@ -5,9 +5,9 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 #endif
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
-    public class MarkerBasedARSample : MonoBehaviour
+    public class MarkerBasedARExample : MonoBehaviour
     {
         
         // Use this for initialization
@@ -40,30 +40,30 @@ namespace MarkerBasedARSample
             #endif
         }
         
-        public void OnTexture2DMarkerBasedARSample ()
+        public void OnTexture2DMarkerBasedARExample ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("Texture2DMarkerBasedARSample");
+            SceneManager.LoadScene ("Texture2DMarkerBasedARExample");
             #else
-            Application.LoadLevel ("Texture2DMarkerBasedARSample");
+            Application.LoadLevel ("Texture2DMarkerBasedARExample");
             #endif
         }
         
-        public void OnWebCamTextureMarkerBasedARSample ()
+        public void OnWebCamTextureMarkerBasedARExample ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("WebCamTextureMarkerBasedARSample");
+            SceneManager.LoadScene ("WebCamTextureMarkerBasedARExample");
             #else
-            Application.LoadLevel ("WebCamTextureMarkerBasedARSample");
+            Application.LoadLevel ("WebCamTextureMarkerBasedARExample");
             #endif
         }
 
-        public void OnGyroSensorMarkerBasedARSample ()
+        public void OnGyroSensorMarkerBasedARExample ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("GyroSensorMarkerBasedARSample");
+            SceneManager.LoadScene ("GyroSensorMarkerBasedARExample");
             #else
-            Application.LoadLevel ("GyroSensorMarkerBasedARSample");
+            Application.LoadLevel ("GyroSensorMarkerBasedARExample");
             #endif
         }
     }

@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
     /// <summary>
     /// Web cam texture to mat helper.

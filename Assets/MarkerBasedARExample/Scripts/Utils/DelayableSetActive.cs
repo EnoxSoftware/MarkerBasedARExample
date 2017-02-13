@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
     
     public class DelayableSetActive : MonoBehaviour

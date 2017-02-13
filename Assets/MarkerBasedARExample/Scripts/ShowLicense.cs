@@ -5,7 +5,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 #endif
 
-namespace MarkerBasedARSample
+namespace MarkerBasedARExample
 {
     public class ShowLicense : MonoBehaviour
     {
@@ -25,9 +25,9 @@ namespace MarkerBasedARSample
         public void OnBackButton ()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-            SceneManager.LoadScene ("MarkerBasedARSample");
+            SceneManager.LoadScene ("MarkerBasedARExample");
             #else
-            Application.LoadLevel ("MarkerBasedARSample");
+            Application.LoadLevel ("MarkerBasedARExample");
 #endif
         }
     }
