@@ -84,7 +84,7 @@ namespace MarkerBasedARExample
         {
 
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
-            webCamTextureToMatHelper.Init ();
+            webCamTextureToMatHelper.Initialize ();
 
         }
 
@@ -278,7 +278,7 @@ namespace MarkerBasedARExample
                 }
                 
 
-                Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors());
+                Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors ());
             }
             
         }
@@ -332,7 +332,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnChangeCameraButton ()
         {
-            webCamTextureToMatHelper.Init (null, webCamTextureToMatHelper.requestWidth, webCamTextureToMatHelper.requestHeight, !webCamTextureToMatHelper.requestIsFrontFacing);
+            webCamTextureToMatHelper.Initialize (null, webCamTextureToMatHelper.requestedWidth, webCamTextureToMatHelper.requestedHeight, !webCamTextureToMatHelper.requestedIsFrontFacing);
         }
 
     }

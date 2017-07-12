@@ -1326,14 +1326,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8b2d7bfd67e6944eb9d702c6fd2724a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requestDeviceName: 
-  requestWidth: 640
-  requestHeight: 480
-  requestIsFrontFacing: 0
+  requestedDeviceName: 
+  requestedWidth: 640
+  requestedHeight: 480
+  requestedIsFrontFacing: 0
+  requestedFPS: 30
   flipVertical: 0
   flipHorizontal: 0
   timeoutFrameCount: 300
-  OnInitedEvent:
+  onInitialized:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1499518484}
@@ -1350,7 +1351,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnDisposedEvent:
+  onDisposed:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1499518484}
@@ -1367,7 +1368,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnErrorOccurredEvent:
+  onErrorOccurred:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: MarkerBasedARExample.WebCamTextureToMatHelper+ErrorUnityEvent, Assembly-CSharp,

@@ -87,24 +87,19 @@ namespace OpenCVMarkerBasedAR
         /// <param name="bits">Bits.</param>
         public static int mat2id (Mat bits)
         {
-            int id = 0;
+
             int size = bits.rows ();
-            byte[] data = new byte[size * size];
-            bits.get (0, 0, data);
-            for (int y=0; y<size; y++) {
-                int lineId = y;
-                for (int x=0; x<size; x++) {
-                    if (x > 0)
-                        lineId <<= 1;
-                    if (data [y * size + x] == 1)
-                        lineId |= 1;
+            byte[] bytes = new byte[size * size];
+            bits.get (0, 0, bytes);
+            bool[] boolArray = new bool[bytes.Length];
+            for (int i = 0; i < boolArray.Length; i++) {
+                if (bytes [i] == 1) {
+                    boolArray [i] = false;
+                } else {
+                    boolArray [i] = true;
                 }
-                id ^= lineId;
-            
-//                      Debug.Log ("lineId " + lineId);
-//                      Debug.Log ("id " + id);
             }
-            return id;
+            return  MarkerSettings.boolArray2id (boolArray);
         }
 
         /// <summary>

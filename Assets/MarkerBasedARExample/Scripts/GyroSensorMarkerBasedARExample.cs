@@ -82,7 +82,7 @@ namespace MarkerBasedARExample
         {
 
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
-            webCamTextureToMatHelper.Init ();
+            webCamTextureToMatHelper.Initialize ();
 
             #if UNITY_EDITOR
             rot = ARCamera.transform.rotation.eulerAngles;
@@ -226,14 +226,14 @@ namespace MarkerBasedARExample
 
 
                 foreach (MarkerSettings settings in markerSettings) {
-                    if(!settings.shouldNotSetToInactivePerFrame){
+                    if (!settings.shouldNotSetToInactivePerFrame) {
                         settings.setAllARGameObjectsDisable ();
-                    }else{
+                    } else {
                         GameObject ARGameObject = settings.getARGameObject ();
                         if (ARGameObject != null) {
-                            DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive>();
-                            if(obj != null){
-                                obj.SetActive(false, 0.5f);
+                            DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive> ();
+                            if (obj != null) {
+                                obj.SetActive (false, 0.5f);
                             }
                         }
                     }
@@ -255,17 +255,17 @@ namespace MarkerBasedARExample
                             if (ARGameObject != null) {
                                 ARUtils.SetTransformFromMatrix (ARGameObject.transform, ref ARM);
 
-                                DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive>();
-                                if(obj != null){
-                                    obj.SetActive(true);
-                                }else{
+                                DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive> ();
+                                if (obj != null) {
+                                    obj.SetActive (true);
+                                } else {
                                     ARGameObject.SetActive (true);
                                 }
                             }
                         }
                     }
                 }
-                Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors());
+                Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors ());
             }
         }
 
@@ -345,7 +345,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnChangeCameraButton ()
         {
-            webCamTextureToMatHelper.Init (null, webCamTextureToMatHelper.requestWidth, webCamTextureToMatHelper.requestHeight, !webCamTextureToMatHelper.requestIsFrontFacing);
+            webCamTextureToMatHelper.Initialize (null, webCamTextureToMatHelper.requestedWidth, webCamTextureToMatHelper.requestedHeight, !webCamTextureToMatHelper.requestedIsFrontFacing);
         }
 
     }

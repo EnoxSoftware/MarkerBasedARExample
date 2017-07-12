@@ -41,21 +41,34 @@ namespace OpenCVMarkerBasedAR
         /// <returns>The marker identifier.</returns>
         public int getMarkerId ()
         {
-            int id = 0;
-            int size = markerDesign.gridSize;
-            for (int y=0; y<size; y++) {
-                int lineId = y;
-                for (int x=0; x<size; x++) {
-                    if (x > 0)
-                        lineId <<= 1;
-                    if (!markerDesign.data [y * size + x])
-                        lineId |= 1;
-                }
-                id ^= lineId;
 
-//                      Debug.Log ("lineId " + lineId);
-//                      Debug.Log ("id " + id);
+            return boolArray2id (markerDesign.data);
+                       
+        }
+
+        public static int boolArray2id (bool[] boolArray)
+        {
+            int id = 0;
+            System.Text.StringBuilder bitString = new System.Text.StringBuilder (32);
+            for (int i = 0; i < boolArray.Length; i++) {
+                if (boolArray [i]) {
+                    bitString.Append (1);
+                } else {
+                    bitString.Append (0);
+                }
+                
+                if (i > 0 && i % 31 == 0) {
+                    id = id + System.Convert.ToInt32 (bitString.ToString (), 2);
+                    bitString.Length = 0;
+                }
             }
+            
+            id = id + System.Convert.ToInt32 (bitString.ToString (), 2);
+            
+            id = id + boolArray.Length;
+
+//            Debug.Log ("id " + id);
+            
             return id;
         }
 
