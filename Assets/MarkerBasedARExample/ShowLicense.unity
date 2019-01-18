@@ -848,7 +848,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1163820098}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: .664882839
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -962,7 +962,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 128267334}
-        m_MethodName: OnBackButton
+        m_MethodName: OnBackButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

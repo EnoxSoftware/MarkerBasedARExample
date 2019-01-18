@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace OpenCVMarkerBasedAR
 {
+    /// <summary>
+    /// Marker settings.
+    /// This code is a rewrite of https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR using "OpenCV for Unity".
+    /// </summary>
     public class MarkerSettings : MonoBehaviour
     {
         /// <summary>
@@ -19,7 +23,7 @@ namespace OpenCVMarkerBasedAR
         /// <summary>
         /// The displayable max count.
         /// </summary>
-        [Range(1 , 50)]
+        [Range (1, 50)]
         public int
             displayableMaxCount;
 
@@ -31,7 +35,7 @@ namespace OpenCVMarkerBasedAR
         /// <summary>
         /// The should not set to inactive per frame.
         /// </summary>
-        [Tooltip("If true, displayableMaxCount is limited to 1.")]
+        [Tooltip ("If true, displayableMaxCount is limited to 1.")]
         public bool
             shouldNotSetToInactivePerFrame;
 
@@ -117,16 +121,5 @@ namespace OpenCVMarkerBasedAR
                 item.SetActive (false);
             }
         }
-
-//      // Use this for initialization
-//      void Start ()
-//      {
-//              
-//      }
-//  
-//  // Update is called once per frame
-//  void Update () {
-//  
-//  }
     }
 }

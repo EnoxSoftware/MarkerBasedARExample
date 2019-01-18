@@ -4,15 +4,13 @@ using System.Collections;
 
 namespace OpenCVMarkerBasedAR
 {
-    [CustomPropertyDrawer(typeof(MarkerDesign))]
+    [CustomPropertyDrawer (typeof(MarkerDesign))]
     public class MarkerDesignPropertyDrawer : PropertyDrawer
     {
         public bool showPosition = true;
-    
+
         public override void OnGUI (UnityEngine.Rect position, SerializedProperty property, GUIContent label)
         {
-        
-        
             //              Debug.Log (position.ToString ());
         
             label = EditorGUI.BeginProperty (position, label, property);
@@ -32,7 +30,7 @@ namespace OpenCVMarkerBasedAR
             
                 UnityEngine.Rect newposition = position;
             
-                //                      Debug.Log (newposition.ToString ());
+                //              Debug.Log (newposition.ToString ());
             
                 newposition.y += 18f;
             
@@ -49,27 +47,25 @@ namespace OpenCVMarkerBasedAR
                 newposition.width = 18f;
                 newposition.height = 18f;
             
-                for (int j=0; j<gridSize.intValue; j++) {
+                for (int j = 0; j < gridSize.intValue; j++) {
                 
                     newposition.x = position.x + (position.width - (newposition.width * gridSize.intValue)) / 2;
                     newposition.y += 18f;
                 
-                    for (int i=0; i<gridSize.intValue; i++) {
+                    for (int i = 0; i < gridSize.intValue; i++) {
                     
                         EditorGUI.PropertyField (newposition, data.GetArrayElementAtIndex (j * gridSize.intValue + i), GUIContent.none);
                         newposition.x += newposition.width;
-                    }
-                
+                    }                
                 }
             
                 EditorGUI.indentLevel = oldIndentLevel;
             }
             EditorGUI.EndProperty ();
         }
-    
+
         public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
-        {
-        
+        {        
             if (showPosition) {
             
                 SerializedProperty gridSize = property.FindPropertyRelative ("gridSize");
@@ -79,6 +75,5 @@ namespace OpenCVMarkerBasedAR
                 return 18f;
             }
         }
-    
     }
 }

@@ -1,30 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
 using System.Linq;
-
-using OpenCVForUnity;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.Calib3dModule;
 
 namespace OpenCVMarkerBasedAR
 {
-
-/// <summary>
-/// Marker detector.
-/// </summary>
+    /// <summary>
+    /// Marker detector.
+    /// This code is a rewrite of https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR using "OpenCV for Unity".
+    /// </summary>
     public class MarkerDetector
     {
-        private byte[,] m_markerDesign = 
-    {
-        {1,0,0,0,0},
-        {0,1,1,1,0},
-        {1,0,1,1,1},
-        {1,0,1,1,1},
-        {1,0,1,1,1}
-        
-    };
+        private byte[,] m_markerDesign = {
+            { 1, 0, 0, 0, 0 },
+            { 0, 1, 1, 1, 0 },
+            { 1, 0, 1, 1, 1 },
+            { 1, 0, 1, 1, 1 },
+            { 1, 0, 1, 1, 1 }
+        };
+
         private List<byte[,]> m_markerDesigns;
-
-
 
         /// <summary>
         /// The m_min contour length allowed.
@@ -119,8 +116,8 @@ namespace OpenCVMarkerBasedAR
                 m_markerDesigns = new List<byte[,]> ();
                 for (int i = 0; i < markerDesigns.Length; i++) {
                     byte[,] tmp_markerDesign = new byte[markerDesigns [i].gridSize, markerDesigns [i].gridSize];
-                    for (int y = 0; y < tmp_markerDesign.GetLength(0); y++) {
-                        for (int x = 0; x < tmp_markerDesign.GetLength(1); x++) {
+                    for (int y = 0; y < tmp_markerDesign.GetLength (0); y++) {
+                        for (int x = 0; x < tmp_markerDesign.GetLength (1); x++) {
                             if (markerDesigns [i].data [y * markerDesigns [i].gridSize + x]) {
                                 tmp_markerDesign [y, x] = 0;
                             } else {
@@ -155,7 +152,7 @@ namespace OpenCVMarkerBasedAR
 //              Debug.Log ("markers " + markers  .Count);
         
             m_findMarkers.Clear ();
-            for (int i=0; i<markers.Count; i++) {
+            for (int i = 0; i < markers.Count; i++) {
                 m_findMarkers.Add (markers [i]);
             }
         }
@@ -256,7 +253,7 @@ namespace OpenCVMarkerBasedAR
 
         
             contours.Clear ();
-            for (int i=0; i<allContours.Count; i++) {
+            for (int i = 0; i < allContours.Count; i++) {
                 int contourSize = allContours [i].toArray ().Length;
                 if (contourSize > minContourPointsAllowed) {
                     contours.Add (allContours [i]);
@@ -276,7 +273,7 @@ namespace OpenCVMarkerBasedAR
             List<Marker> possibleMarkers = new List<Marker> ();
         
             // For each contour, analyze if it is a parallelepiped likely to be the marker
-            for (int i=0; i<contours.Count; i++) {
+            for (int i = 0; i < contours.Count; i++) {
                 // Approximate to a polygon
                 double eps = contours [i].toArray ().Length * 0.05;
                 Imgproc.approxPolyDP (new MatOfPoint2f (contours [i].toArray ()), approxCurve, eps, true);
@@ -311,7 +308,7 @@ namespace OpenCVMarkerBasedAR
 
                 List<Point> markerPointsList = new List<Point> ();
             
-                for (int p = 0; p<4; p++)
+                for (int p = 0; p < 4; p++)
                     markerPointsList.Add (new Point (approxCurveArray [p].x, approxCurveArray [p].y));
 
 
@@ -344,13 +341,13 @@ namespace OpenCVMarkerBasedAR
             // Remove these elements which corners are too close to each other.
             // First detect candidates for removal:
             List< Point > tooNearCandidates = new List<Point> ();
-            for (int i=0; i<possibleMarkers.Count; i++) {
+            for (int i = 0; i < possibleMarkers.Count; i++) {
                 Marker m1 = possibleMarkers [i];
 
                 Point[] m1PointsArray = m1.points.toArray ();
             
                 //calculate the average distance of each corner to the nearest corner of the other marker candidate
-                for (int j=i+1; j<possibleMarkers.Count; j++) {
+                for (int j = i + 1; j < possibleMarkers.Count; j++) {
                     Marker m2 = possibleMarkers [j];
 
                     Point[] m2PointsArray = m2.points.toArray ();
@@ -376,7 +373,7 @@ namespace OpenCVMarkerBasedAR
                 removalMask.Add (false);
             }
         
-            for (int i=0; i<tooNearCandidates.Count; i++) {
+            for (int i = 0; i < tooNearCandidates.Count; i++) {
 
                 float p1 = perimeter (possibleMarkers [(int)tooNearCandidates [i].x].points);
                 float p2 = perimeter (possibleMarkers [(int)tooNearCandidates [i].y].points);
@@ -392,7 +389,7 @@ namespace OpenCVMarkerBasedAR
         
             // Return candidates
             detectedMarkers.Clear ();
-            for (int i=0; i<possibleMarkers.Count; i++) {
+            for (int i = 0; i < possibleMarkers.Count; i++) {
                 if (!removalMask [i])
                     detectedMarkers.Add (possibleMarkers [i]);
             }
@@ -408,7 +405,7 @@ namespace OpenCVMarkerBasedAR
             List<Marker> goodMarkers = new List<Marker> ();
         
             // Identify the markers
-            for (int i=0; i<detectedMarkers.Count; i++) {
+            for (int i = 0; i < detectedMarkers.Count; i++) {
                 Marker marker = detectedMarkers [i];
 
             
@@ -419,10 +416,10 @@ namespace OpenCVMarkerBasedAR
                 // Transform image to get a canonical marker image
                 Imgproc.warpPerspective (grayscale, canonicalMarkerImage, markerTransform, markerSize);
 
-                for (int p=0; p<m_markerDesigns.Count; p++) {
+                for (int p = 0; p < m_markerDesigns.Count; p++) {
                     MatOfInt nRotations = new MatOfInt (0);
                     int id = Marker.getMarkerId (canonicalMarkerImage, nRotations, m_markerDesigns [p]);
-                    if (id != - 1) {
+                    if (id != -1) {
                         marker.id = id;
 //                              Debug.Log ("id " + id);
 
@@ -451,12 +448,12 @@ namespace OpenCVMarkerBasedAR
                         
 
             
-                for (int i=0; i<goodMarkers.Count; i++) {
+                for (int i = 0; i < goodMarkers.Count; i++) {
                     Marker marker = goodMarkers [i];
 
                     List<Point> markerPointsList = marker.points.toList ();
                 
-                    for (int c = 0; c <4; c++) {
+                    for (int c = 0; c < 4; c++) {
                         preciseCornersPoint [i * 4 + c] = markerPointsList [c];
                     }
                 }
@@ -469,12 +466,12 @@ namespace OpenCVMarkerBasedAR
                 preciseCornersPoint = preciseCorners.toList ();
             
                 // Copy refined corners position back to markers
-                for (int i=0; i<goodMarkers.Count; i++) {
+                for (int i = 0; i < goodMarkers.Count; i++) {
                     Marker marker = goodMarkers [i];
 
                     List<Point> markerPointsList = marker.points.toList ();
                 
-                    for (int c=0; c<4; c++) {
+                    for (int c = 0; c < 4; c++) {
                         markerPointsList [c] = preciseCornersPoint [i * 4 + c];
                     }
                 }
@@ -483,7 +480,6 @@ namespace OpenCVMarkerBasedAR
 
             detectedMarkers.Clear ();
             detectedMarkers.AddRange (goodMarkers);
-
         }
 
         /// <summary>
@@ -492,9 +488,7 @@ namespace OpenCVMarkerBasedAR
         /// <param name="detectedMarkers">Detected markers.</param>
         void estimatePosition (List<Marker> detectedMarkers)
         {
-
-
-            for (int i=0; i<detectedMarkers.Count; i++) {
+            for (int i = 0; i < detectedMarkers.Count; i++) {
                 Marker m = detectedMarkers [i];
             
                 Mat Rvec = new Mat ();
@@ -538,7 +532,7 @@ namespace OpenCVMarkerBasedAR
 
             float sum = 0, dx = 0, dy = 0;
             
-            for (int i=0; i<aList.Count; i++) {
+            for (int i = 0; i < aList.Count; i++) {
                 int i2 = (i + 1) % aList.Count;
                 
                 dx = (float)aList [i].x - (float)aList [i2].x;
@@ -549,7 +543,7 @@ namespace OpenCVMarkerBasedAR
             
             return sum;
         }
-        
+
         /// <summary>
         /// Ises the into.
         /// </summary>
@@ -558,14 +552,12 @@ namespace OpenCVMarkerBasedAR
         /// <param name="b">The blue component.</param>
         bool isInto (MatOfPoint2f contour, List<Point> b)
         {
-            for (int i=0; i<b.Count; i++) {
+            for (int i = 0; i < b.Count; i++) {
                 if (Imgproc.pointPolygonTest (contour, b [i], false) > 0)
                     return true;
                 
             }
             return false;
-    
         }
-
     }
 }

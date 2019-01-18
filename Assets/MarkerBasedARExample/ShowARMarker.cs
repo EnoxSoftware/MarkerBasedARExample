@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-
-#if UNITY_5_3 || UNITY_5_3_OR_NEWER
-using UnityEngine.SceneManagement;
-#endif
 
 namespace MarkerBasedARExample
 {
@@ -13,9 +10,8 @@ namespace MarkerBasedARExample
     /// </summary>
     public class ShowARMarker : MonoBehaviour
     {
-
         /// <summary>
-        /// The marker texture.
+        /// Show ARMarker
         /// </summary>
         public Texture2D[] markerTexture;
 
@@ -26,8 +22,7 @@ namespace MarkerBasedARExample
 
         // Use this for initialization
         void Start ()
-        {
-            
+        {           
             float width = gameObject.transform.localScale.x;
             float height = gameObject.transform.localScale.y;
 
@@ -56,27 +51,22 @@ namespace MarkerBasedARExample
         {
 
         }
-        
+
         /// <summary>
         /// Raises the back button event.
         /// </summary>
-        public void OnBackButton ()
+        public void OnBackButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("MarkerBasedARExample");
-            #else
-            Application.LoadLevel ("MarkerBasedARExample");
-#endif
         }
 
         /// <summary>
         /// Raises the change marker button event.
         /// </summary>
-        public void OnChangeMarkerButton ()
+        public void OnChangeMarkerButtonClick ()
         {
             index = (index + 1) % markerTexture.Length;
             gameObject.GetComponent<Renderer> ().material.mainTexture = markerTexture [index];
         }
     }
-    
 }

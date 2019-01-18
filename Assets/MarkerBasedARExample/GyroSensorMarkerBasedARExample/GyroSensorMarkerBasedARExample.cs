@@ -1,21 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-
-#if UNITY_5_3 || UNITY_5_3_OR_NEWER
 using UnityEngine.SceneManagement;
-#endif
-using OpenCVForUnity;
+using System.Collections.Generic;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Calib3dModule;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.UnityUtils.Helper;
 using OpenCVMarkerBasedAR;
 
 namespace MarkerBasedARExample
 {
     /// <summary>
-    /// Gyro Sensor Marker based AR example.
+    /// Gyro Sensor Marker Based AR Example
+    /// An example of augmented reality display method with gyro sensor.
     /// </summary>
-    [RequireComponent(typeof(WebCamTextureToMatHelper))]
+    [RequireComponent (typeof(WebCamTextureToMatHelper))]
     public class GyroSensorMarkerBasedARExample : MonoBehaviour
     {
+        /// <summary>
+        /// The AR camera.
+        /// </summary>
+        public Camera ARCamera;
+
+        /// <summary>
+        /// The marker settings.
+        /// </summary>
+        public MarkerSettings[] markerSettings;
 
         /// <summary>
         /// The texture.
@@ -23,12 +32,7 @@ namespace MarkerBasedARExample
         Texture2D texture;
 
         /// <summary>
-        /// The AR camera.
-        /// </summary>
-        public Camera ARCamera;
-
-        /// <summary>
-        /// The cam matrix.
+        /// The cameraparam matrix.
         /// </summary>
         Mat camMatrix;
 
@@ -43,45 +47,43 @@ namespace MarkerBasedARExample
         MarkerDetector markerDetector;
 
         /// <summary>
-        /// The invert Y.
+        /// The matrix that inverts the Y axis.
         /// </summary>
         Matrix4x4 invertYM;
 
         /// <summary>
-        /// The transformation m.
-        /// </summary>
-        Matrix4x4 transformationM;
-
-        /// <summary>
-        /// The invert Z.
+        /// The matrix that inverts the Z axis.
         /// </summary>
         Matrix4x4 invertZM;
 
         /// <summary>
-        /// The ar m.
+        /// The transformation matrix.
         /// </summary>
-        Matrix4x4 ARM;
-        
-        /// <summary>
-        /// The marker settings.
-        /// </summary>
-        public MarkerSettings[] markerSettings;
+        Matrix4x4 transformationM;
 
         /// <summary>
-        /// The web cam texture to mat helper.
+        /// The transformation matrix for AR.
+        /// </summary>
+        Matrix4x4 ARM;
+
+        /// <summary>
+        /// The webcam texture to mat helper.
         /// </summary>
         WebCamTextureToMatHelper webCamTextureToMatHelper;
 
-
         #if UNITY_EDITOR
-        private Vector3 rot;
+        Vector3 rot;
         #endif
         
         // Use this for initialization
         void Start ()
         {
-
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
+
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            // Avoids the front camera low light issue that occurs in only some Android devices (e.g. Google Pixel, Pixel2).
+            webCamTextureToMatHelper.avoidAndroidFrontCameraLowLightIssue = true;
+            #endif
             webCamTextureToMatHelper.Initialize ();
 
             #if UNITY_EDITOR
@@ -92,11 +94,11 @@ namespace MarkerBasedARExample
         }
 
         /// <summary>
-        /// Raises the web cam texture to mat helper inited event.
+        /// Raises the web cam texture to mat helper initialized event.
         /// </summary>
-        public void OnWebCamTextureToMatHelperInited ()
+        public void OnWebCamTextureToMatHelperInitialized ()
         {
-            Debug.Log ("OnWebCamTextureToMatHelperInited");
+            Debug.Log ("OnWebCamTextureToMatHelperInitialized");
             
             Mat webCamTextureMat = webCamTextureToMatHelper.GetMat ();
 
@@ -120,7 +122,6 @@ namespace MarkerBasedARExample
             } else {
                 Camera.main.orthographicSize = height / 2;
             }
-            
 
 
             //set cameraparam
@@ -185,8 +186,8 @@ namespace MarkerBasedARExample
             MarkerDesign[] markerDesigns = new MarkerDesign[markerSettings.Length];
             for (int i = 0; i < markerDesigns.Length; i++) {
                 markerDesigns [i] = markerSettings [i].markerDesign;
-            }                           
-                                
+            }
+
             markerDetector = new MarkerDetector (camMatrix, distCoeffs, markerDesigns);
 
 
@@ -195,27 +196,34 @@ namespace MarkerBasedARExample
             
             invertZM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, 1, -1));
             Debug.Log ("invertZM " + invertZM.ToString ());
-                        
+
 
             //if WebCamera is frontFaceing,flip Mat.
             if (webCamTextureToMatHelper.GetWebCamDevice ().isFrontFacing) {
                 webCamTextureToMatHelper.flipHorizontal = true;
             }
         }
-        
+
         /// <summary>
         /// Raises the web cam texture to mat helper disposed event.
         /// </summary>
         public void OnWebCamTextureToMatHelperDisposed ()
         {
             Debug.Log ("OnWebCamTextureToMatHelperDisposed");
-            
+        }
+
+        /// <summary>
+        /// Raises the web cam texture to mat helper error occurred event.
+        /// </summary>
+        /// <param name="errorCode">Error code.</param>
+        public void OnWebCamTextureToMatHelperErrorOccurred (WebCamTextureToMatHelper.ErrorCode errorCode)
+        {
+            Debug.Log ("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
         }
 
         // Update is called once per frame
         void Update ()
         {
-
             if (webCamTextureToMatHelper.IsPlaying () && webCamTextureToMatHelper.DidUpdateThisFrame ()) {
 
                 UpdateARCameraTransform ();
@@ -265,7 +273,7 @@ namespace MarkerBasedARExample
                         }
                     }
                 }
-                Utils.matToTexture2D (rgbaMat, texture, webCamTextureToMatHelper.GetBufferColors ());
+                Utils.fastMatToTexture2D (rgbaMat, texture);
             }
         }
 
@@ -292,9 +300,9 @@ namespace MarkerBasedARExample
         }
 
         /// <summary>
-        /// Raises the disable event.
+        /// Raises the destroy event.
         /// </summary>
-        void OnDisable ()
+        void OnDestroy ()
         {
             webCamTextureToMatHelper.Dispose ();
 
@@ -303,50 +311,45 @@ namespace MarkerBasedARExample
             Input.gyro.enabled = false;
             #endif
         }
-        
+
         /// <summary>
-        /// Raises the back button event.
+        /// Raises the back button click event.
         /// </summary>
-        public void OnBackButton ()
+        public void OnBackButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("MarkerBasedARExample");
-            #else
-            Application.LoadLevel ("MarkerBasedARExample");
-            #endif
         }
-        
+
         /// <summary>
-        /// Raises the play button event.
+        /// Raises the play button click event.
         /// </summary>
-        public void OnPlayButton ()
+        public void OnPlayButtonClick ()
         {
             webCamTextureToMatHelper.Play ();
         }
-        
+
         /// <summary>
-        /// Raises the pause button event.
+        /// Raises the pause button click event.
         /// </summary>
-        public void OnPauseButton ()
+        public void OnPauseButtonClick ()
         {
             webCamTextureToMatHelper.Pause ();
         }
-        
+
         /// <summary>
-        /// Raises the stop button event.
+        /// Raises the stop button click event.
         /// </summary>
-        public void OnStopButton ()
+        public void OnStopButtonClick ()
         {
             webCamTextureToMatHelper.Stop ();
         }
-        
-        /// <summary>
-        /// Raises the change camera button event.
-        /// </summary>
-        public void OnChangeCameraButton ()
-        {
-            webCamTextureToMatHelper.Initialize (null, webCamTextureToMatHelper.requestedWidth, webCamTextureToMatHelper.requestedHeight, !webCamTextureToMatHelper.requestedIsFrontFacing);
-        }
 
+        /// <summary>
+        /// Raises the change camera button click event.
+        /// </summary>
+        public void OnChangeCameraButtonClick ()
+        {
+            webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.IsFrontFacing ();
+        }
     }
 }

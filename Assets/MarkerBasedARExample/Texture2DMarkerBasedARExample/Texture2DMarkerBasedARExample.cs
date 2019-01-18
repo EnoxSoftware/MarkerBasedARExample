@@ -1,19 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-
-#if UNITY_5_3 || UNITY_5_3_OR_NEWER
 using UnityEngine.SceneManagement;
-#endif
-using OpenCVForUnity;
+using System.Collections.Generic;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.Calib3dModule;
 using OpenCVMarkerBasedAR;
 
 namespace MarkerBasedARExample
 {
-/// <summary>
-/// Texture2D Marker based AR example.
-/// https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR by using "OpenCV for Unity"
-/// </summary>
+    /// <summary>
+    /// Texture2D Marker Based AR Example
+    /// This code is a rewrite of https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR using "OpenCV for Unity".
+    /// </summary>
     public class Texture2DMarkerBasedARExample : MonoBehaviour
     {
         /// <summary>
@@ -32,17 +30,14 @@ namespace MarkerBasedARExample
         public MarkerSettings[] markerSettings;
 
         /// <summary>
-        /// The should move AR camera.
+        /// Determines if should move AR camera.
         /// </summary>
-        [Tooltip("If true, only the first element of markerSettings will be processed.")]
-        public bool
-            shouldMoveARCamera;
-        
+        [Tooltip ("If true, only the first element of markerSettings will be processed.")]
+        public bool shouldMoveARCamera;
 
         // Use this for initialization
         void Start ()
         {
-
             gameObject.transform.localScale = new Vector3 (imgTexture.width, imgTexture.height, 1);
             Debug.Log ("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
 
@@ -52,8 +47,8 @@ namespace MarkerBasedARExample
             Debug.Log ("imgMat dst ToString " + imgMat.ToString ());
 
 
-            float width = imgMat.width();
-            float height = imgMat.height();
+            float width = imgMat.width ();
+            float height = imgMat.height ();
             
             float imageSizeScale = 1.0f;
             float widthScale = (float)Screen.width / width;
@@ -64,7 +59,7 @@ namespace MarkerBasedARExample
             } else {
                 Camera.main.orthographicSize = height / 2;
             }
-                        
+
             //set cameraparam
             int max_d = (int)Mathf.Max (width, height);
             double fx = max_d;
@@ -140,7 +135,6 @@ namespace MarkerBasedARExample
 
 
             if (shouldMoveARCamera) {
-
                 List<Marker> findMarkers = markerDetector.getFindMarkers ();
                 if (findMarkers.Count > 0) {
                     
@@ -158,8 +152,7 @@ namespace MarkerBasedARExample
         
                             Matrix4x4 invertYM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, -1, 1));
                             Debug.Log ("invertYM " + invertYM.ToString ());
-                            
-                                                        
+
 
                             GameObject ARGameObject = settings.getARGameObject ();
                             if (ARGameObject != null) {
@@ -168,7 +161,6 @@ namespace MarkerBasedARExample
                                 ARGameObject.SetActive (true);
                                 ARUtils.SetTransformFromMatrix (ARCamera.transform, ref ARM);
                             }
-                                                        
                         }
                     }
                 }
@@ -182,7 +174,7 @@ namespace MarkerBasedARExample
                             Matrix4x4 transformationM = marker.transformation;
                             Debug.Log ("transformationM " + transformationM.ToString ());
 
-                                                        
+
                             Matrix4x4 invertYM = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, new Vector3 (1, -1, 1));
                             Debug.Log ("invertYM " + invertYM.ToString ());
                     
@@ -216,14 +208,12 @@ namespace MarkerBasedARExample
     
         }
 
-        public void OnBackButton ()
+        /// <summary>
+        /// Raises the back button click event.
+        /// </summary>
+        public void OnBackButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("MarkerBasedARExample");
-            #else
-            Application.LoadLevel ("MarkerBasedARExample");
-#endif
         }
-
     }
 }
