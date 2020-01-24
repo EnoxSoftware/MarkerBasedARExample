@@ -199,9 +199,7 @@ namespace MarkerBasedARExample
 
 
             //if WebCamera is frontFaceing,flip Mat.
-            if (webCamTextureToMatHelper.GetWebCamDevice ().isFrontFacing) {
-                webCamTextureToMatHelper.flipHorizontal = true;
-            }
+            webCamTextureToMatHelper.flipHorizontal = webCamTextureToMatHelper.GetWebCamDevice ().isFrontFacing;
         }
 
         /// <summary>

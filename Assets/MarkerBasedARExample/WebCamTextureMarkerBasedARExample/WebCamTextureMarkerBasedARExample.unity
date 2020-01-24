@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 1
     m_BakeResolution: 50
     m_TextureWidth: 1024
@@ -89,7 +89,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -254,6 +254,7 @@ MonoBehaviour:
   m_PreferredHeight: 40
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &27729139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -851,7 +852,6 @@ GameObject:
   m_Component:
   - component: {fileID: 579058577}
   - component: {fileID: 579058576}
-  - component: {fileID: 579058575}
   - component: {fileID: 579058574}
   - component: {fileID: 579058573}
   m_Layer: 0
@@ -869,13 +869,6 @@ AudioListener:
   m_GameObject: {fileID: 579058572}
   m_Enabled: 1
 --- !u!124 &579058574
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 579058572}
-  m_Enabled: 1
---- !u!92 &579058575
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1178,6 +1171,7 @@ MonoBehaviour:
   m_PreferredHeight: 40
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &1272263618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1460,6 +1454,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: OpenCVForUnity.UnityUtils.Helper.WebCamTextureToMatHelper+ErrorUnityEvent,
       Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  avoidAndroidFrontCameraLowLightIssue: 0
 --- !u!114 &1499518484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1638,7 +1633,6 @@ GameObject:
   - component: {fileID: 1783707268}
   - component: {fileID: 1783707267}
   - component: {fileID: 1783707266}
-  - component: {fileID: 1783707265}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1646,19 +1640,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1783707265
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400000, guid: c80c9118ad8efca4d90a4c4af4e9464a,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1783707264}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1997211142, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ForceModuleActive: 0
 --- !u!114 &1783707266
 MonoBehaviour:
   m_ObjectHideFlags: 0
