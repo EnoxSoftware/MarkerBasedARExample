@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace MarkerBasedARExample
 {
@@ -21,25 +19,28 @@ namespace MarkerBasedARExample
         int index = 0;
 
         // Use this for initialization
-        void Start ()
-        {           
+        void Start()
+        {
             float width = gameObject.transform.localScale.x;
             float height = gameObject.transform.localScale.y;
 
             float widthScale = (float)Screen.width / width;
             float heightScale = (float)Screen.height / height;
-            if (widthScale < heightScale) {
+            if (widthScale < heightScale)
+            {
                 Camera.main.orthographicSize = (width * (float)Screen.height / (float)Screen.width) / 2;
-            } else {
+            }
+            else
+            {
                 Camera.main.orthographicSize = height / 2;
             }
 
-            gameObject.GetComponent<Renderer> ().material.mainTexture = markerTexture [index];
+            gameObject.GetComponent<Renderer>().material.mainTexture = markerTexture[index];
         }
 
 
         // Update is called once per frame
-        void Update ()
+        void Update()
         {
 
         }
@@ -47,7 +48,7 @@ namespace MarkerBasedARExample
         /// <summary>
         /// Raises the disable event.
         /// </summary>
-        void OnDisable ()
+        void OnDisable()
         {
 
         }
@@ -55,18 +56,18 @@ namespace MarkerBasedARExample
         /// <summary>
         /// Raises the back button event.
         /// </summary>
-        public void OnBackButtonClick ()
+        public void OnBackButtonClick()
         {
-            SceneManager.LoadScene ("MarkerBasedARExample");
+            SceneManager.LoadScene("MarkerBasedARExample");
         }
 
         /// <summary>
         /// Raises the change marker button event.
         /// </summary>
-        public void OnChangeMarkerButtonClick ()
+        public void OnChangeMarkerButtonClick()
         {
             index = (index + 1) % markerTexture.Length;
-            gameObject.GetComponent<Renderer> ().material.mainTexture = markerTexture [index];
+            gameObject.GetComponent<Renderer>().material.mainTexture = markerTexture[index];
         }
     }
 }

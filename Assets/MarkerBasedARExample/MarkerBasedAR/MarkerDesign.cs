@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace OpenCVMarkerBasedAR
+﻿namespace OpenCVMarkerBasedAR
 {
     /// <summary>
     /// Marker design.

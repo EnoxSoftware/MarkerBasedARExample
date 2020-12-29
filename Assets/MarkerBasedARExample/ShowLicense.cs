@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
 namespace MarkerBasedARExample
 {
@@ -10,20 +9,20 @@ namespace MarkerBasedARExample
     public class ShowLicense : MonoBehaviour
     {
         // Use this for initialization
-        void Start ()
+        void Start()
         {
-            
-        }
-        
-        // Update is called once per frame
-        void Update ()
-        {
-            
+
         }
 
-        public void OnBackButtonClick ()
+        // Update is called once per frame
+        void Update()
         {
-            SceneManager.LoadScene ("MarkerBasedARExample");
+
+        }
+
+        public void OnBackButtonClick()
+        {
+            SceneManager.LoadScene("MarkerBasedARExample");
         }
     }
 }
