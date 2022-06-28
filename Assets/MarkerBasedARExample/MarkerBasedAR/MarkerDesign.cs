@@ -1,4 +1,4 @@
-﻿namespace OpenCVMarkerBasedAR
+namespace OpenCVMarkerBasedAR
 {
     /// <summary>
     /// Marker design.
