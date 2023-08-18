@@ -18,7 +18,7 @@ Demo
 - WebGL
 <https://enoxsoftware.github.io/MarkerBasedARExample/webgl_example/index.html>
 - Android
-<https://play.google.com/store/apps/details?id=com.enoxsoftware.markerbasedarexample>
+<https://github.com/EnoxSoftware/MarkerBasedARExample/releases>
 
 Manual
 -----
