@@ -15,10 +15,8 @@ Setup Tutorial & Demo Video
 
 Demo
 -----
-- WebGL
-<https://enoxsoftware.github.io/MarkerBasedARExample/webgl_example/index.html>
-- Android
-<https://github.com/EnoxSoftware/MarkerBasedARExample/releases>
+- WebGL (simd) <https://enoxsoftware.github.io/MarkerBasedARExample/webgl_example/index.html>
+- Android <https://github.com/EnoxSoftware/MarkerBasedARExample/releases>
 
 Manual
 -----
