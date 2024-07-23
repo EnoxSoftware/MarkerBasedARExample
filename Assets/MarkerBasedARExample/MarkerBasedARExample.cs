@@ -1,5 +1,6 @@
 using OpenCVForUnity.CoreModule;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -77,17 +78,38 @@ namespace MarkerBasedARExample
 
         public void OnTexture2DMarkerBasedARExampleButtonClick()
         {
-            SceneManager.LoadScene("Texture2DMarkerBasedARExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("Texture2DMarkerBasedARExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("Texture2DMarkerBasedARExample_SRP");
+            }
         }
 
         public void OnWebCamTextureMarkerBasedARExampleButtonClick()
         {
-            SceneManager.LoadScene("WebCamTextureMarkerBasedARExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("WebCamTextureMarkerBasedARExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("WebCamTextureMarkerBasedARExample_SRP");
+            }
         }
 
         public void OnGyroSensorMarkerBasedARExampleButtonClick()
         {
-            SceneManager.LoadScene("GyroSensorMarkerBasedARExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("GyroSensorMarkerBasedARExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("GyroSensorMarkerBasedARExample_SRP");
+            }
         }
     }
 }
