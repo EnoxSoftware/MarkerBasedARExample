@@ -1269,7 +1269,7 @@ GameObject:
   - component: {fileID: 1410197063}
   - component: {fileID: 1410197062}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: Texture2DMarkerBasedARExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1313,7 +1313,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c145e8db7609c3045b74f3cb18eab914, type: 2}
+  - {fileID: 2100000, guid: 344c8f6c685dc46448a9606b6c875d47, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

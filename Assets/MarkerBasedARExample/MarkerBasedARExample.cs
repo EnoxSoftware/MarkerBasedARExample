@@ -88,15 +88,15 @@ namespace MarkerBasedARExample
             }
         }
 
-        public void OnWebCamTextureMarkerBasedARExampleButtonClick()
+        public void OnMultiSourceMarkerBasedARExampleButtonClick()
         {
             if (GraphicsSettings.defaultRenderPipeline == null)
             {
-                SceneManager.LoadScene("WebCamTextureMarkerBasedARExample_Built-in");
+                SceneManager.LoadScene("MultiSourceMarkerBasedARExample_Built-in");
             }
             else
             {
-                SceneManager.LoadScene("WebCamTextureMarkerBasedARExample_SRP");
+                SceneManager.LoadScene("MultiSourceMarkerBasedARExample_SRP");
             }
         }
 
