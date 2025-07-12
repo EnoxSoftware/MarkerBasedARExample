@@ -1,6 +1,6 @@
 using OpenCVForUnity.Calib3dModule;
 using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.UnityIntegration;
 using OpenCVMarkerBasedAR;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,7 +43,7 @@ namespace MarkerBasedARExample
 
             Mat imgMat = new Mat(imgTexture.height, imgTexture.width, CvType.CV_8UC4);
 
-            Utils.texture2DToMat(imgTexture, imgMat);
+            OpenCVMatUtils.Texture2DToMat(imgTexture, imgMat);
             Debug.Log("imgMat dst ToString " + imgMat.ToString());
 
 
@@ -180,7 +180,7 @@ namespace MarkerBasedARExample
                                 Debug.Log("ARM " + ARM.ToString());
 
                                 ARGameObject.SetActive(true);
-                                ARUtils.SetTransformFromMatrix(ARCamera.transform, ref ARM);
+                                OpenCVARUtils.SetTransformFromMatrix(ARCamera.transform, ref ARM);
                             }
                         }
                     }
@@ -221,7 +221,7 @@ namespace MarkerBasedARExample
                             GameObject ARGameObject = settings.getARGameObject();
                             if (ARGameObject != null)
                             {
-                                ARUtils.SetTransformFromMatrix(ARGameObject.transform, ref ARM);
+                                OpenCVARUtils.SetTransformFromMatrix(ARGameObject.transform, ref ARM);
                                 ARGameObject.SetActive(true);
                             }
                         }
@@ -232,7 +232,7 @@ namespace MarkerBasedARExample
 
             Texture2D texture = new Texture2D(imgMat.cols(), imgMat.rows(), TextureFormat.RGBA32, false);
 
-            Utils.matToTexture2D(imgMat, texture);
+            OpenCVMatUtils.MatToTexture2D(imgMat, texture);
 
             gameObject.GetComponent<Renderer>().material.mainTexture = texture;
         }

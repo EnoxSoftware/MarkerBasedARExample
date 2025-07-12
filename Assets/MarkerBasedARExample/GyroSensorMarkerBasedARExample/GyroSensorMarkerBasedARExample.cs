@@ -1,7 +1,7 @@
 using OpenCVForUnity.Calib3dModule;
 using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.UnityUtils;
-using OpenCVForUnity.UnityUtils.Helper;
+using OpenCVForUnity.UnityIntegration;
+using OpenCVForUnity.UnityIntegration.Helper.Source2Mat;
 using OpenCVMarkerBasedAR;
 using System.Collections.Generic;
 using UnityEngine;
@@ -74,7 +74,7 @@ namespace MarkerBasedARExample
         void Start()
         {
             multiSource2MatHelper = gameObject.GetComponent<MultiSource2MatHelper>();
-            multiSource2MatHelper.outputColorFormat = Source2MatHelperColorFormat.RGBA;
+            multiSource2MatHelper.OutputColorFormat = Source2MatHelperColorFormat.RGBA;
             multiSource2MatHelper.Initialize();
 
 #if UNITY_EDITOR
@@ -94,7 +94,7 @@ namespace MarkerBasedARExample
             Mat rgbaMat = multiSource2MatHelper.GetMat();
 
             texture = new Texture2D(rgbaMat.cols(), rgbaMat.rows(), TextureFormat.RGBA32, false);
-            Utils.matToTexture2D(rgbaMat, texture);
+            OpenCVMatUtils.MatToTexture2D(rgbaMat, texture);
 
             // Set the Texture2D as the main texture of the Renderer component attached to the game object
             gameObject.GetComponent<Renderer>().material.mainTexture = texture;
@@ -199,8 +199,8 @@ namespace MarkerBasedARExample
 
 
             // If the WebCam is front facing, flip the Mat horizontally. Required for successful detection.
-            if (multiSource2MatHelper.source2MatHelper is WebCamTexture2MatHelper webCamHelper)
-                webCamHelper.flipHorizontal = webCamHelper.IsFrontFacing();
+            if (multiSource2MatHelper.Source2MatHelper is WebCamTexture2MatHelper webCamHelper)
+                webCamHelper.FlipHorizontal = webCamHelper.IsFrontFacing();
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace MarkerBasedARExample
 
             if (fpsMonitor != null)
             {
-                fpsMonitor.consoleText = "ErrorCode: " + errorCode + ":" + message;
+                fpsMonitor.ConsoleText = "ErrorCode: " + errorCode + ":" + message;
             }
         }
 
@@ -284,7 +284,7 @@ namespace MarkerBasedARExample
                             GameObject ARGameObject = settings.getARGameObject();
                             if (ARGameObject != null)
                             {
-                                ARUtils.SetTransformFromMatrix(ARGameObject.transform, ref ARM);
+                                OpenCVARUtils.SetTransformFromMatrix(ARGameObject.transform, ref ARM);
 
                                 DelayableSetActive obj = ARGameObject.GetComponent<DelayableSetActive>();
                                 if (obj != null)
@@ -299,7 +299,7 @@ namespace MarkerBasedARExample
                         }
                     }
                 }
-                Utils.matToTexture2D(rgbaMat, texture);
+                OpenCVMatUtils.MatToTexture2D(rgbaMat, texture);
             }
         }
 
@@ -379,7 +379,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnChangeCameraButtonClick()
         {
-            multiSource2MatHelper.requestedIsFrontFacing = !multiSource2MatHelper.requestedIsFrontFacing;
+            multiSource2MatHelper.RequestedIsFrontFacing = !multiSource2MatHelper.RequestedIsFrontFacing;
         }
     }
 }
