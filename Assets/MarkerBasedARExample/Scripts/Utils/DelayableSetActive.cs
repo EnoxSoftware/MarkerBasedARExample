@@ -35,7 +35,9 @@ namespace MarkerBasedARExample
                 }
 
                 if (gameObject.activeSelf && deactivateCoroutine == null)
+                {
                     deactivateCoroutine = StartCoroutine(DeactivateGameObject(delayTime));
+                }
             }
         }
 

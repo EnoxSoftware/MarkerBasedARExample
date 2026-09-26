@@ -1,9 +1,12 @@
-using OpenCVForUnity.Calib3dModule;
-using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.UnityIntegration;
-using OpenCVForUnity.UnityIntegration.Helper.Source2Mat;
-using OpenCVMarkerBasedAR;
 using System.Collections.Generic;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Extensions;
+using OpenCVForUnity.Extensions.SourceToMat;
+using OpenCVForUnity.GeometryModule;
+using OpenCVForUnity.UnityIntegration;
+using OpenCVForUnity.UnityIntegration.Helper.SourceToMat;
+using OpenCVForUnity.UnityIntegration.Helper.UI;
+using OpenCVMarkerBasedAR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,7 +16,7 @@ namespace MarkerBasedARExample
     /// MultiSource Marker Based AR Example
     /// This code is a rewrite of https://github.com/MasteringOpenCV/code/tree/master/Chapter2_iPhoneAR using "OpenCV for Unity".
     /// </summary>
-    [RequireComponent(typeof(MultiSource2MatHelper))]
+    [RequireComponent(typeof(MultiSourceToMatHelper))]
     public class MultiSourceMarkerBasedARExample : MonoBehaviour
     {
         /// <summary>
@@ -35,49 +38,50 @@ namespace MarkerBasedARExample
         /// <summary>
         /// The texture.
         /// </summary>
-        Texture2D texture;
+        private Texture2D texture;
 
         /// <summary>
         /// The cameraparam matrix.
         /// </summary>
-        Mat camMatrix;
+        private Mat camMatrix;
 
         /// <summary>
         /// The dist coeffs.
         /// </summary>
-        MatOfDouble distCoeffs;
+        private MatOfDouble distCoeffs;
 
         /// <summary>
         /// The marker detector.
         /// </summary>
-        MarkerDetector markerDetector;
+        private MarkerDetector markerDetector;
 
         /// <summary>
         /// The matrix that inverts the Y axis.
         /// </summary>
-        Matrix4x4 invertYM;
+        private Matrix4x4 invertYM;
 
         /// <summary>
         /// The matrix that inverts the Z axis.
         /// </summary>
-        Matrix4x4 invertZM;
+        private Matrix4x4 invertZM;
 
         /// <summary>
         /// The multi source to mat helper.
         /// </summary>
-        MultiSource2MatHelper multiSource2MatHelper;
+        private MultiSourceToMatHelper multiSourceToMatHelper;
 
         /// <summary>
         /// The FPS monitor.
         /// </summary>
-        FpsMonitor fpsMonitor;
+        private FpsMonitor fpsMonitor;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
-            multiSource2MatHelper = gameObject.GetComponent<MultiSource2MatHelper>();
-            multiSource2MatHelper.OutputColorFormat = Source2MatHelperColorFormat.RGBA;
-            multiSource2MatHelper.Initialize();
+            multiSourceToMatHelper = gameObject.GetComponent<MultiSourceToMatHelper>();
+
+            multiSourceToMatHelper.OutputColorFormat = SourceToMatColorFormat.RGBA;
+            multiSourceToMatHelper.Initialize();
         }
 
         /// <summary>
@@ -87,10 +91,10 @@ namespace MarkerBasedARExample
         {
             Debug.Log("OnSourceToMatHelperInitialized");
 
-            Mat rgbaMat = multiSource2MatHelper.GetMat();
+            Mat rgbaMat = multiSourceToMatHelper.FrameMat;
 
             texture = new Texture2D(rgbaMat.cols(), rgbaMat.rows(), TextureFormat.RGBA32, false);
-            OpenCVMatUtils.MatToTexture2D(rgbaMat, texture);
+            OpenCVMatUnityUtils.MatToTexture2D(rgbaMat, texture);
 
             // Set the Texture2D as the main texture of the Renderer component attached to the game object
             gameObject.GetComponent<Renderer>().material.mainTexture = texture;
@@ -114,7 +118,6 @@ namespace MarkerBasedARExample
             {
                 Camera.main.orthographicSize = height / 2;
             }
-
 
             //set cameraparam
             int max_d = (int)Mathf.Max(width, height);
@@ -147,8 +150,7 @@ namespace MarkerBasedARExample
             Point principalPoint = new Point(0, 0);
             double[] aspectratio = new double[1];
 
-
-            Calib3d.calibrationMatrixValues(camMatrix, imageSize, apertureWidth, apertureHeight, fovx, fovy, focalLength, principalPoint, aspectratio);
+            Geometry.calibrationMatrixValues(camMatrix, imageSize, apertureWidth, apertureHeight, fovx, fovy, focalLength, principalPoint, aspectratio);
 
             Debug.Log("imageSize " + imageSize.ToString());
             Debug.Log("apertureWidth " + apertureWidth);
@@ -159,14 +161,12 @@ namespace MarkerBasedARExample
             Debug.Log("principalPoint " + principalPoint.ToString());
             Debug.Log("aspectratio " + aspectratio[0]);
 
-
-            //To convert the difference of the FOV value of the OpenCV and Unity. 
+            //To convert the difference of the FOV value of the OpenCV and Unity.
             double fovXScale = (2.0 * Mathf.Atan((float)(imageSize.width / (2.0 * fx)))) / (Mathf.Atan2((float)cx, (float)fx) + Mathf.Atan2((float)(imageSize.width - cx), (float)fx));
             double fovYScale = (2.0 * Mathf.Atan((float)(imageSize.height / (2.0 * fy)))) / (Mathf.Atan2((float)cy, (float)fy) + Mathf.Atan2((float)(imageSize.height - cy), (float)fy));
 
             Debug.Log("fovXScale " + fovXScale);
             Debug.Log("fovYScale " + fovYScale);
-
 
             //Adjust Unity Camera FOV https://github.com/opencv/opencv/commit/8ed1945ccd52501f5ab22bdec6aa1f91f1e2cfd4
             if (widthScale < heightScale)
@@ -178,7 +178,6 @@ namespace MarkerBasedARExample
                 ARCamera.fieldOfView = (float)(fovy[0] * fovYScale);
             }
 
-
             MarkerDesign[] markerDesigns = new MarkerDesign[markerSettings.Length];
             for (int i = 0; i < markerDesigns.Length; i++)
             {
@@ -187,18 +186,22 @@ namespace MarkerBasedARExample
 
             markerDetector = new MarkerDetector(camMatrix, distCoeffs, markerDesigns);
 
-
-
             invertYM = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, -1, 1));
             Debug.Log("invertYM " + invertYM.ToString());
 
             invertZM = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, -1));
             Debug.Log("invertZM " + invertZM.ToString());
 
-
             // If the WebCam is front facing, flip the Mat horizontally. Required for successful detection.
-            if (multiSource2MatHelper.Source2MatHelper is WebCamTexture2MatHelper webCamHelper)
-                webCamHelper.FlipHorizontal = webCamHelper.IsFrontFacing();
+            if (multiSourceToMatHelper.ActiveHelper is WebCamTextureToMatHelper webCamHelper)
+            {
+                webCamHelper.FlipHorizontal = webCamHelper.IsFrontFacing;
+            }
+
+            if (!multiSourceToMatHelper.IsPlaying && !multiSourceToMatHelper.IsPaused)
+            {
+                multiSourceToMatHelper.Play();
+            }
         }
 
         /// <summary>
@@ -207,6 +210,16 @@ namespace MarkerBasedARExample
         public void OnSourceToMatHelperDisposed()
         {
             Debug.Log("OnSourceToMatHelperDisposed");
+            DisposeFrameResources();
+        }
+
+        /// <summary>
+        /// Recreates frame-dependent resources after the output FrameMat layout changes.
+        /// </summary>
+        public void OnFrameMatLayoutChanged()
+        {
+            DisposeFrameResources();
+            OnSourceToMatHelperInitialized();
         }
 
         /// <summary>
@@ -214,7 +227,7 @@ namespace MarkerBasedARExample
         /// </summary>
         /// <param name="errorCode">Error code.</param>
         /// <param name="message">Message.</param>
-        public void OnSourceToMatHelperErrorOccurred(Source2MatHelperErrorCode errorCode, string message)
+        public void OnSourceToMatHelperErrorOccurred(SourceToMatErrorCode errorCode, string message)
         {
             Debug.Log("OnSourceToMatHelperErrorOccurred " + errorCode + ":" + message);
 
@@ -225,15 +238,14 @@ namespace MarkerBasedARExample
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-            if (multiSource2MatHelper.IsPlaying() && multiSource2MatHelper.DidUpdateThisFrame())
+            if (multiSourceToMatHelper.IsPlaying && multiSourceToMatHelper.DidUpdateThisFrame)
             {
 
-                Mat rgbaMat = multiSource2MatHelper.GetMat();
+                Mat rgbaMat = multiSourceToMatHelper.FrameMat;
 
                 markerDetector.processFrame(rgbaMat, 1);
-
 
                 foreach (MarkerSettings settings in markerSettings)
                 {
@@ -311,16 +323,16 @@ namespace MarkerBasedARExample
                     }
                 }
 
-                OpenCVMatUtils.MatToTexture2D(rgbaMat, texture);
+                OpenCVMatUnityUtils.MatToTexture2D(rgbaMat, texture);
             }
         }
 
         /// <summary>
         /// Raises the destroy event.
         /// </summary>
-        void OnDestroy()
+        private void OnDestroy()
         {
-            multiSource2MatHelper.Dispose();
+
         }
 
         /// <summary>
@@ -336,7 +348,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnPlayButtonClick()
         {
-            multiSource2MatHelper.Play();
+            multiSourceToMatHelper.Play();
         }
 
         /// <summary>
@@ -344,7 +356,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnPauseButtonClick()
         {
-            multiSource2MatHelper.Pause();
+            multiSourceToMatHelper.Pause();
         }
 
         /// <summary>
@@ -352,7 +364,7 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnStopButtonClick()
         {
-            multiSource2MatHelper.Stop();
+            multiSourceToMatHelper.Stop();
         }
 
         /// <summary>
@@ -360,7 +372,30 @@ namespace MarkerBasedARExample
         /// </summary>
         public void OnChangeCameraButtonClick()
         {
-            multiSource2MatHelper.RequestedIsFrontFacing = !multiSource2MatHelper.RequestedIsFrontFacing;
+            if (multiSourceToMatHelper.ActiveHelper is ICameraFacingToMatHelperControls cameraControls)
+            {
+                cameraControls.RequestedIsFrontFacing = !cameraControls.RequestedIsFrontFacing;
+            }
+        }
+
+        /// <summary>
+        /// Releases resources owned by this example for the current frame layout.
+        /// </summary>
+        private void DisposeFrameResources()
+        {
+            if (texture != null)
+            {
+                Destroy(texture);
+                texture = null;
+            }
+
+            camMatrix?.Dispose();
+            camMatrix = null;
+
+            distCoeffs?.Dispose();
+            distCoeffs = null;
+
+            markerDetector = null;
         }
     }
 }

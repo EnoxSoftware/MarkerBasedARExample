@@ -1,8 +1,8 @@
-using OpenCVForUnity.Calib3dModule;
-using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.ImgprocModule;
 using System.Collections.Generic;
 using System.Linq;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.GeometryModule;
+using OpenCVForUnity.ImgprocModule;
 using UnityEngine;
 
 namespace OpenCVMarkerBasedAR
@@ -88,10 +88,8 @@ namespace OpenCVMarkerBasedAR
             m_minContourLengthAllowed = 100;
             markerSize = new Size(100, 100);
 
-
             camMatrix.copyTo(this.camMatrix);
             distCoeff.copyTo(this.distCoeff);
-
 
             List<Point3> m_markerCorners3dList = new List<Point3>();
 
@@ -101,7 +99,6 @@ namespace OpenCVMarkerBasedAR
             m_markerCorners3dList.Add(new Point3(-0.5f, +0.5f, 0));
 
             m_markerCorners3d.fromList(m_markerCorners3dList);
-
 
             List<Point> m_markerCorners2dList = new List<Point>();
 
@@ -173,7 +170,7 @@ namespace OpenCVMarkerBasedAR
         /// </summary>
         /// <param name="bgraMat">Bgra mat.</param>
         /// <param name="detectedMarkers">Detected markers.</param>
-        void findMarkers(Mat bgraMat, List<Marker> detectedMarkers)
+        private void findMarkers(Mat bgraMat, List<Marker> detectedMarkers)
         {
             // Convert the image to grayscale
             Imgproc.cvtColor(bgraMat, m_grayscaleImage, Imgproc.COLOR_BGRA2GRAY);
@@ -193,8 +190,6 @@ namespace OpenCVMarkerBasedAR
             // Calculate their poses
             estimatePosition(detectedMarkers);
 
-
-
             // Debug
             // for (int i = 0; i < detectedMarkers.Count; i++)
             // {
@@ -210,11 +205,9 @@ namespace OpenCVMarkerBasedAR
             //     );
             //     //                        Debug.Log ("P " + P.dump ());
 
-
             //     Mat KP = new Mat(3, 4, CvType.CV_64FC1);
             //     Core.gemm(camMatrix, P, 1, new Mat(3, 4, CvType.CV_64FC1), 0, KP);
             //     //                        Debug.Log ("KP " + KP.dump ());
-
 
             //     Point3[] op = m_markerCorners3d.toArray();
             //     for (int p = 0; p < m_markerCorners3d.rows(); p++)
@@ -222,7 +215,6 @@ namespace OpenCVMarkerBasedAR
             //         Mat X = new Mat(4, 1, CvType.CV_64FC1);
             //         X.put(0, 0, op[p].x, op[p].y, op[p].z, 1.0);
             //         //Debug.Log ("X " + X.dump ());
-
 
             //         Mat opt_p = new Mat(4, 1, CvType.CV_64FC1);
             //         Core.gemm(KP, X, 1, new Mat(4, 1, CvType.CV_64FC1), 0, opt_p);
@@ -250,11 +242,10 @@ namespace OpenCVMarkerBasedAR
         /// <param name="thresholdImg">Threshold image.</param>
         /// <param name="contours">Contours.</param>
         /// <param name="minContourPointsAllowed">Minimum contour points allowed.</param>
-        void findContours(Mat thresholdImg, List<MatOfPoint> contours, int minContourPointsAllowed)
+        private void findContours(Mat thresholdImg, List<MatOfPoint> contours, int minContourPointsAllowed)
         {
             List<MatOfPoint> allContours = new List<MatOfPoint>();
             Imgproc.findContours(thresholdImg, allContours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
-
 
             contours.Clear();
             for (int i = 0; i < allContours.Count; i++)
@@ -272,7 +263,7 @@ namespace OpenCVMarkerBasedAR
         /// </summary>
         /// <param name="contours">Contours.</param>
         /// <param name="detectedMarkers">Detected markers.</param>
-        void findCandidates(List<MatOfPoint> contours, List<Marker> detectedMarkers)
+        private void findCandidates(List<MatOfPoint> contours, List<Marker> detectedMarkers)
         {
             MatOfPoint2f approxCurve = new MatOfPoint2f();
 
@@ -283,18 +274,21 @@ namespace OpenCVMarkerBasedAR
             {
                 // Approximate to a polygon
                 double eps = contours[i].toArray().Length * 0.05;
-                Imgproc.approxPolyDP(new MatOfPoint2f(contours[i].toArray()), approxCurve, eps, true);
+                Geometry.approxPolyDP(new MatOfPoint2f(contours[i].toArray()), approxCurve, eps, true);
 
                 Point[] approxCurveArray = approxCurve.toArray();
 
                 // We interested only in polygons that contains only four points
                 if (approxCurveArray.Length != 4)
+                {
                     continue;
+                }
 
                 // And they have to be convex
-                if (!Imgproc.isContourConvex(new MatOfPoint(approxCurveArray)))
+                if (!Geometry.isContourConvex(new MatOfPoint(approxCurveArray)))
+                {
                     continue;
-
+                }
 
                 // Ensure that the distance between consecutive points is large enough
                 float minDist = float.MaxValue;
@@ -308,7 +302,9 @@ namespace OpenCVMarkerBasedAR
 
                 // Check that distance is not very small
                 if (minDist < m_minContourLengthAllowed)
+                {
                     continue;
+                }
 
                 // All tests are passed. Save marker candidate:
                 Marker m = new Marker();
@@ -317,8 +313,9 @@ namespace OpenCVMarkerBasedAR
                 List<Point> markerPointsList = new List<Point>();
 
                 for (int p = 0; p < 4; p++)
+                {
                     markerPointsList.Add(new Point(approxCurveArray[p].x, approxCurveArray[p].y));
-
+                }
 
                 // Sort the points in anti-clockwise order
                 // Trace a line between the first and second point.
@@ -342,7 +339,6 @@ namespace OpenCVMarkerBasedAR
                 possibleMarkers.Add(m);
             }
             approxCurve.Dispose();
-
 
             // Remove these elements which corners are too close to each other.
             // First detect candidates for removal:
@@ -392,9 +388,13 @@ namespace OpenCVMarkerBasedAR
 
                 int removalIndex;
                 if (p1 > p2)
+                {
                     removalIndex = (int)tooNearCandidates[i].x;
+                }
                 else
+                {
                     removalIndex = (int)tooNearCandidates[i].y;
+                }
 
                 removalMask[removalIndex] = true;
             }
@@ -404,7 +404,9 @@ namespace OpenCVMarkerBasedAR
             for (int i = 0; i < possibleMarkers.Count; i++)
             {
                 if (!removalMask[i])
+                {
                     detectedMarkers.Add(possibleMarkers[i]);
+                }
             }
         }
 
@@ -413,7 +415,7 @@ namespace OpenCVMarkerBasedAR
         /// </summary>
         /// <param name="grayscale">Grayscale.</param>
         /// <param name="detectedMarkers">Detected markers.</param>
-        void recognizeMarkers(Mat grayscale, List<Marker> detectedMarkers)
+        private void recognizeMarkers(Mat grayscale, List<Marker> detectedMarkers)
         {
             List<Marker> goodMarkers = new List<Marker>();
 
@@ -423,7 +425,7 @@ namespace OpenCVMarkerBasedAR
                 Marker marker = detectedMarkers[i];
 
                 // Find the perspective transformation that brings current marker to rectangular form
-                Mat markerTransform = Imgproc.getPerspectiveTransform(new MatOfPoint2f(marker.points.toArray()), m_markerCorners2d);
+                Mat markerTransform = Geometry.getPerspectiveTransform(new MatOfPoint2f(marker.points.toArray()), m_markerCorners2d);
 
                 // Transform image to get a canonical marker image
                 Imgproc.warpPerspective(grayscale, canonicalMarkerImage, markerTransform, markerSize);
@@ -501,7 +503,7 @@ namespace OpenCVMarkerBasedAR
         /// Estimates the position.
         /// </summary>
         /// <param name="detectedMarkers">Detected markers.</param>
-        void estimatePosition(List<Marker> detectedMarkers)
+        private void estimatePosition(List<Marker> detectedMarkers)
         {
             for (int i = 0; i < detectedMarkers.Count; i++)
             {
@@ -511,19 +513,18 @@ namespace OpenCVMarkerBasedAR
                 Mat Tvec = new Mat();
                 Mat raux = new Mat();
                 Mat taux = new Mat();
-                Calib3d.solvePnP(m_markerCorners3d, new MatOfPoint2f(m.points.toArray()), camMatrix, distCoeff, raux, taux);
+                Geometry.solvePnP(m_markerCorners3d, new MatOfPoint2f(m.points.toArray()), camMatrix, distCoeff, raux, taux);
 
                 raux.convertTo(Rvec, CvType.CV_32F);
                 taux.convertTo(Tvec, CvType.CV_32F);
 
                 Mat rotMat = new Mat(3, 3, CvType.CV_64FC1);
-                Calib3d.Rodrigues(Rvec, rotMat);
+                Geometry.Rodrigues(Rvec, rotMat);
 
                 m.transformation.SetRow(0, new Vector4((float)rotMat.get(0, 0)[0], (float)rotMat.get(0, 1)[0], (float)rotMat.get(0, 2)[0], (float)Tvec.get(0, 0)[0]));
                 m.transformation.SetRow(1, new Vector4((float)rotMat.get(1, 0)[0], (float)rotMat.get(1, 1)[0], (float)rotMat.get(1, 2)[0], (float)Tvec.get(1, 0)[0]));
                 m.transformation.SetRow(2, new Vector4((float)rotMat.get(2, 0)[0], (float)rotMat.get(2, 1)[0], (float)rotMat.get(2, 2)[0], (float)Tvec.get(2, 0)[0]));
                 m.transformation.SetRow(3, new Vector4(0, 0, 0, 1));
-
 
                 Rvec.Dispose();
                 Tvec.Dispose();
@@ -537,7 +538,7 @@ namespace OpenCVMarkerBasedAR
         /// Perimeter the specified a.
         /// </summary>
         /// <param name="a">The alpha component.</param>
-        float perimeter(MatOfPoint a)
+        private float perimeter(MatOfPoint a)
         {
             List<Point> aList = a.toList();
 
@@ -562,13 +563,14 @@ namespace OpenCVMarkerBasedAR
         /// <returns><c>true</c>, if into was ised, <c>false</c> otherwise.</returns>
         /// <param name="contour">Contour.</param>
         /// <param name="b">The blue component.</param>
-        bool isInto(MatOfPoint2f contour, List<Point> b)
+        private bool isInto(MatOfPoint2f contour, List<Point> b)
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if (Imgproc.pointPolygonTest(contour, b[i], false) > 0)
+                if (Geometry.pointPolygonTest(contour, b[i], false) > 0)
+                {
                     return true;
-
+                }
             }
             return false;
         }

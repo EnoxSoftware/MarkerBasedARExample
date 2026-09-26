@@ -82,11 +82,16 @@ namespace OpenCVMarkerBasedAR
         public GameObject getARGameObject()
         {
             if (shouldNotSetToInactivePerFrame)
+            {
                 return ARGameObjectDiplicates[0];
+            }
+
             foreach (GameObject item in ARGameObjectDiplicates)
             {
                 if (!item.activeSelf)
+                {
                     return item;
+                }
             }
             return null;
         }
@@ -97,25 +102,34 @@ namespace OpenCVMarkerBasedAR
         public void setAllARGameObjectsDisable()
         {
             if (shouldNotSetToInactivePerFrame)
+            {
                 return;
+            }
+
             foreach (GameObject item in ARGameObjectDiplicates)
             {
                 item.SetActive(false);
             }
         }
 
-        void Awake()
+        private void Awake()
         {
             if (shouldNotSetToInactivePerFrame)
+            {
                 displayableMaxCount = 1;
+            }
+
             if (displayableMaxCount < 1)
+            {
                 displayableMaxCount = 1;
+            }
+
             ARGameObjectDiplicates = new List<GameObject>();
             ARGameObjectDiplicates.Add(ARGameObject);
             for (int i = 1; i < displayableMaxCount; i++)
             {
                 GameObject diplicate = GameObject.Instantiate(ARGameObject);
-                diplicate.transform.parent = this.transform;
+                diplicate.transform.parent = transform;
                 ARGameObjectDiplicates.Add(diplicate);
             }
 

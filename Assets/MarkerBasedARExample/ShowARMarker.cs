@@ -25,19 +25,18 @@ namespace MarkerBasedARExample
         /// <summary>
         /// The index.
         /// </summary>
-        int index = 0;
+        private int index = 0;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             Texture2D texture = markerTexture[index];
             resultPreview.texture = texture;
             resultPreview.GetComponent<AspectRatioFitter>().aspectRatio = (float)texture.width / texture.height;
         }
 
-
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
 
         }
@@ -45,7 +44,7 @@ namespace MarkerBasedARExample
         /// <summary>
         /// Raises the disable event.
         /// </summary>
-        void OnDisable()
+        private void OnDisable()
         {
 
         }

@@ -117,7 +117,6 @@ namespace OpenCVMarkerBasedAR
             // Threshold image
             Imgproc.threshold(grey, grey, 125, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
 
-
             //Markers  are divided in 7x7 regions, of which the inner 5x5 belongs to marker info
             //the external border should be entirely black
 
@@ -130,14 +129,15 @@ namespace OpenCVMarkerBasedAR
                 int inc = size + 1;
 
                 if (y == 0 || y == (size + 1))
+                {
                     inc = 1; //for first and last row, check the whole border
+                }
 
                 for (int x = 0; x < (size + 2); x += inc)
                 {
                     int cellX = x * cellSize;
                     int cellY = y * cellSize;
                     Mat cell = new Mat(grey, new OpenCVForUnity.CoreModule.Rect(cellX, cellY, cellSize, cellSize));
-
 
                     int nZ = Core.countNonZero(cell);
 
@@ -164,7 +164,9 @@ namespace OpenCVMarkerBasedAR
                     int nZ = Core.countNonZero(cell);
 
                     if (nZ > (cellSize * cellSize) / 2)
+                    {
                         bitMatrix.put(y, x, new byte[] { 1 });
+                    }
 
                     cell.Dispose();
                 }
@@ -178,10 +180,8 @@ namespace OpenCVMarkerBasedAR
             }
             int[] distances = new int[4];
 
-
             rotations[0] = bitMatrix;
             distances[0] = hammDistMarker(rotations[0], markerDesign);
-
 
             int first = distances[0];
             int second = 0;
@@ -203,7 +203,6 @@ namespace OpenCVMarkerBasedAR
             if (first == 0)
             {
                 int id = mat2id(rotations[second]);
-
 
                 bitMatrix.Dispose();
                 for (int i = 0; i < rotations.Length; i++)

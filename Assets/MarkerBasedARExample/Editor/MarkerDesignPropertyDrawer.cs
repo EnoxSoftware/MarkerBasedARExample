@@ -1,6 +1,6 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections;
+using UnityEditor;
+using UnityEngine;
 
 namespace OpenCVMarkerBasedAR
 {
@@ -28,7 +28,6 @@ namespace OpenCVMarkerBasedAR
                 position = EditorGUI.IndentedRect(position);
                 EditorGUI.indentLevel = 0;
 
-
                 UnityEngine.Rect newposition = position;
 
                 //Debug.Log (newposition.ToString ());
@@ -38,7 +37,9 @@ namespace OpenCVMarkerBasedAR
                 SerializedProperty gridSize = property.FindPropertyRelative("gridSize");
                 EditorGUI.PropertyField(new UnityEngine.Rect(position.x, position.y + 18, position.width, 18), gridSize);
                 if (gridSize.intValue <= 0)
+                {
                     gridSize.intValue = 1;
+                }
 
                 newposition.y += 18f;
                 SerializedProperty data = property.FindPropertyRelative("data");

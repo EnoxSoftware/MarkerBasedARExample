@@ -1,8 +1,9 @@
-using OpenCVForUnity.Calib3dModule;
+using System.Collections.Generic;
 using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Extensions;
+using OpenCVForUnity.GeometryModule;
 using OpenCVForUnity.UnityIntegration;
 using OpenCVMarkerBasedAR;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,16 +37,15 @@ namespace MarkerBasedARExample
         public bool shouldMoveARCamera;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             gameObject.transform.localScale = new Vector3(imgTexture.width, imgTexture.height, 1);
             Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
 
             Mat imgMat = new Mat(imgTexture.height, imgTexture.width, CvType.CV_8UC4);
 
-            OpenCVMatUtils.Texture2DToMat(imgTexture, imgMat);
+            OpenCVMatUnityUtils.Texture2DToMat(imgTexture, imgMat);
             Debug.Log("imgMat dst ToString " + imgMat.ToString());
-
 
             float width = imgMat.width();
             float height = imgMat.height();
@@ -94,7 +94,7 @@ namespace MarkerBasedARExample
             Point principalPoint = new Point(0, 0);
             double[] aspectratio = new double[1];
 
-            Calib3d.calibrationMatrixValues(camMatrix, imageSize, apertureWidth, apertureHeight, fovx, fovy, focalLength, principalPoint, aspectratio);
+            Geometry.calibrationMatrixValues(camMatrix, imageSize, apertureWidth, apertureHeight, fovx, fovy, focalLength, principalPoint, aspectratio);
 
             Debug.Log("imageSize " + imageSize.ToString());
             Debug.Log("apertureWidth " + apertureWidth);
@@ -105,14 +105,12 @@ namespace MarkerBasedARExample
             Debug.Log("principalPoint " + principalPoint.ToString());
             Debug.Log("aspectratio " + aspectratio[0]);
 
-
-            //To convert the difference of the FOV value of the OpenCV and Unity. 
+            //To convert the difference of the FOV value of the OpenCV and Unity.
             double fovXScale = (2.0 * Mathf.Atan((float)(imageSize.width / (2.0 * fx)))) / (Mathf.Atan2((float)cx, (float)fx) + Mathf.Atan2((float)(imageSize.width - cx), (float)fx));
             double fovYScale = (2.0 * Mathf.Atan((float)(imageSize.height / (2.0 * fy)))) / (Mathf.Atan2((float)cy, (float)fy) + Mathf.Atan2((float)(imageSize.height - cy), (float)fy));
 
             Debug.Log("fovXScale " + fovXScale);
             Debug.Log("fovYScale " + fovYScale);
-
 
             //Adjust Unity Camera FOV
             if (widthScale < heightScale)
@@ -124,7 +122,6 @@ namespace MarkerBasedARExample
                 ARCamera.fieldOfView = (float)(fovy[0] * fovYScale);
             }
 
-
             MarkerDesign[] markerDesigns = new MarkerDesign[markerSettings.Length];
             for (int i = 0; i < markerDesigns.Length; i++)
             {
@@ -135,12 +132,10 @@ namespace MarkerBasedARExample
 
             markerDetector.processFrame(imgMat, 1);
 
-
             foreach (MarkerSettings settings in markerSettings)
             {
                 settings.setAllARGameObjectsDisable();
             }
-
 
             if (shouldMoveARCamera)
             {
@@ -200,7 +195,6 @@ namespace MarkerBasedARExample
                             Matrix4x4 transformationM = marker.transformation;
                             Debug.Log("transformationM " + transformationM.ToString());
 
-
                             Matrix4x4 invertYM = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, -1, 1));
                             Debug.Log("invertYM " + invertYM.ToString());
 
@@ -229,16 +223,15 @@ namespace MarkerBasedARExample
                 }
             }
 
-
             Texture2D texture = new Texture2D(imgMat.cols(), imgMat.rows(), TextureFormat.RGBA32, false);
 
-            OpenCVMatUtils.MatToTexture2D(imgMat, texture);
+            OpenCVMatUnityUtils.MatToTexture2D(imgMat, texture);
 
             gameObject.GetComponent<Renderer>().material.mainTexture = texture;
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
 
         }

@@ -14,14 +14,17 @@ namespace MarkerBasedARExample
         public Text exampleTitle;
         public Text versionInfo;
         public ScrollRect scrollRect;
-        static float verticalNormalizedPosition = 1f;
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
+#endif
+        private static float verticalNormalizedPosition = 1f;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             exampleTitle.text = "MarkerBasedAR Example " + Application.version;
 
-            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnity.UnityIntegration.OpenCVEnv.GetVersion() + " (" + Core.VERSION + ")";
+            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnity.UnityIntegration.OpenCVForUnityEnv.GetVersion() + " (" + Core.VERSION + ")";
             versionInfo.text += " / UnityEditor " + Application.unityVersion;
             versionInfo.text += " / ";
 
@@ -55,7 +58,7 @@ namespace MarkerBasedARExample
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
 
         }
@@ -64,7 +67,6 @@ namespace MarkerBasedARExample
         {
             verticalNormalizedPosition = scrollRect.verticalNormalizedPosition;
         }
-
 
         public void OnShowLicenseButtonClick()
         {
@@ -78,7 +80,7 @@ namespace MarkerBasedARExample
 
         public void OnTexture2DMarkerBasedARExampleButtonClick()
         {
-            if (GraphicsSettings.defaultRenderPipeline == null)
+            if (GraphicsSettings.currentRenderPipeline == null)
             {
                 SceneManager.LoadScene("Texture2DMarkerBasedARExample_Built-in");
             }
@@ -90,7 +92,7 @@ namespace MarkerBasedARExample
 
         public void OnMultiSourceMarkerBasedARExampleButtonClick()
         {
-            if (GraphicsSettings.defaultRenderPipeline == null)
+            if (GraphicsSettings.currentRenderPipeline == null)
             {
                 SceneManager.LoadScene("MultiSourceMarkerBasedARExample_Built-in");
             }
@@ -102,7 +104,7 @@ namespace MarkerBasedARExample
 
         public void OnGyroSensorMarkerBasedARExampleButtonClick()
         {
-            if (GraphicsSettings.defaultRenderPipeline == null)
+            if (GraphicsSettings.currentRenderPipeline == null)
             {
                 SceneManager.LoadScene("GyroSensorMarkerBasedARExample_Built-in");
             }
